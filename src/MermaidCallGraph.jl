@@ -27,29 +27,19 @@ function extract_function_name(sig::SyntaxNode)::Union{String, Nothing}
 
     children = get_children(sig)
     
-    if isempty(children)
-        return nothing
-    end
+    isempty(children) && return nothing
     
     first_child = children[1]
     call_node = get_kind(first_child) in ("call", "call-") ? first_child :
-                get_kind(sig) in ("call", "call-") ? sig : nothing
-    
-    if call_node === nothing
-        return nothing
-    end
+                get_kind(sig) in ("call", "call-") ? sig : return nothing
     
     call_children = get_children(call_node)
 
-    if isempty(call_children)
-        return nothing
-    end
+    isempty(call_children) && return nothing
     
     name_node = call_children[1]
 
-    if get_kind(name_node) == "Identifier"
-        return string(name_node)
-    end
+    get_kind(name_node) == "Identifier" && return string(name_node)
     
     return nothing
 end
@@ -78,9 +68,7 @@ function collect_definitions(
         end
     end
     
-    for child in get_children(node)
-        collect_definitions(child, defs, bodies, path)
-    end
+    foreach(child -> collect_definitions(child, defs, bodies, path), get_children(node))
     
     return nothing
 end
@@ -94,18 +82,12 @@ function find_internal_calls(
 )::Set{Tuple{String, String}}
 
     call_pattern = r"([A-Za-z_][A-Za-z0-9_]*!?)\s*\("
-    edges = Set{Tuple{String, String}}()
-    
-    for (caller, _, body) in bodies
-        for match_obj in eachmatch(call_pattern, body)
-            callee = match_obj.captures[1]
-            if callee in defs && caller != callee
-                push!(edges, (caller, callee))
-            end
-        end
-    end
-    
-    return edges
+    return Set(
+        (caller, callee) for (caller, _, body) in bodies
+                         for m in eachmatch(call_pattern, body)
+                         for callee in m.captures
+                         if callee in defs && caller != callee
+    )
 end
 
 """
@@ -125,17 +107,12 @@ function generate_mermaid_markdown(
         subgraph_name = replace(path, input_dir * "/" => "")
         push!(lines, "    subgraph $(subgraph_name)")
         funcs = sort(unique(name for (name, p, _) in bodies if p == path))
-        for f in funcs
-            push!(lines, "        $f[\"$f\"]")
-        end
+        append!(lines, "        $f[\"$f\"]" for f in funcs)
         push!(lines, "    end")
     end
     
     sorted_edges = sort(collect(edges))
-
-    for (a, b) in sorted_edges
-        push!(lines, "    $a --> $b")
-    end
+    append!(lines, "    $a --> $b" for (a, b) in sorted_edges)
     
     return join(lines, "\n")
 end
@@ -144,18 +121,11 @@ end
 Recursively find all Julia source files in a directory.
 """
 function find_jl_files(dir::String)::Vector{String}
-
-    files = String[]
-    
-    for entry in readdir(dir, join=true)
-        if isdir(entry)
-            append!(files, find_jl_files(entry))
-        elseif endswith(entry, ".jl")
-            push!(files, entry)
-        end
-    end
-    
-    return files
+    entries = readdir(dir, join=true)
+    return vcat(
+        [find_jl_files(f) for f in entries if isdir(f)]...,
+        [f for f in entries if endswith(f, ".jl")],
+    )
 end
 
 """
