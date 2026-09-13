@@ -3,7 +3,7 @@ module MermaidCallGraph
 import JuliaSyntax
 using JuliaSyntax: parseall, SyntaxNode, sourcetext
 
-export main
+export mermaid_call_graph
 
 """
 Return the children of a syntax node as a vector.
@@ -129,17 +129,17 @@ function find_jl_files(dir::String)::Vector{String}
 end
 
 """
-    main(; input_dir="src", output_file="MermaidCallGraph.md", orientation="LR")
+    mermaid_call_graph(; input_dir="src", output_file="MermaidCallGraph.md", orientation="LR")
 
 Main entry point to analyze project source and write the flow graph.
 All arguments are keyword arguments; a positional variant
-`main(input_dir, output_file, orientation)` is also available.
+`mermaid_call_graph(input_dir, output_file, orientation)` is also available.
 """
-function main(; input_dir::String="src", output_file::String="MermaidCallGraph.md", orientation::String="LR")::Nothing
+function mermaid_call_graph(; input_dir::String="src", output_file::String="MermaidCallGraph.md", orientation::String="LR")::Nothing
     return _generate(input_dir, output_file, orientation)
 end
 
-function main(input_dir::String, output_file::String, orientation::String)::Nothing
+function mermaid_call_graph(input_dir::String, output_file::String, orientation::String)::Nothing
     return _generate(input_dir, output_file, orientation)
 end
 

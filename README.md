@@ -21,7 +21,7 @@ flowchart TD
         generate_mermaid_markdown["generate_mermaid_markdown"]
         get_children["get_children"]
         get_kind["get_kind"]
-        main["main"]
+        mermaid_call_graph["mermaid_call_graph"]
     end
     _generate --> collect_definitions
     _generate --> find_internal_calls
@@ -32,7 +32,7 @@ flowchart TD
     collect_definitions --> get_kind
     extract_function_name --> get_children
     extract_function_name --> get_kind
-    main --> _generate
+    mermaid_call_graph --> _generate
 ```
 
 ## Usage
@@ -40,7 +40,7 @@ flowchart TD
 From the project root, run:
 
 ```bash
-julia --project=. -e 'using MermaidCallGraph; main()'
+julia --project=. -e 'using MermaidCallGraph; mermaid_call_graph()'
 ```
 
 This analyzes all Julia files under `src/` and writes `MermaidCallGraph.md` in
@@ -48,7 +48,7 @@ the current directory.
 
 ### Arguments
 
-`main` accepts three optional keyword arguments:
+`mermaid_call_graph` accepts three optional keyword arguments:
 
 | Argument      | Default                 | Description                                 |
 |---------------|-------------------------|---------------------------------------------|
@@ -59,13 +59,13 @@ the current directory.
 ### Examples
 
 ```bash
-julia --project=. -e 'using MermaidCallGraph; main("lib", "callgraph.md", "TD")'
+julia --project=. -e 'using MermaidCallGraph; mermaid_call_graph("lib", "callgraph.md", "TD")'
 ```
 
 Or using keyword arguments:
 
 ```bash
-julia --project=. -e 'using MermaidCallGraph; main(input_dir="lib", output_file="graph.md", orientation="TB")'
+julia --project=. -e 'using MermaidCallGraph; mermaid_call_graph(input_dir="lib", output_file="graph.md", orientation="TB")'
 ```
 
 ## Contributing

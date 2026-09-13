@@ -9,7 +9,7 @@ flowchart LR
         generate_mermaid_markdown["generate_mermaid_markdown"]
         get_children["get_children"]
         get_kind["get_kind"]
-        main["main"]
+        mermaid_call_graph["mermaid_call_graph"]
     end
     _generate --> collect_definitions
     _generate --> find_internal_calls
@@ -20,5 +20,5 @@ flowchart LR
     collect_definitions --> get_kind
     extract_function_name --> get_children
     extract_function_name --> get_kind
-    main --> _generate
+    mermaid_call_graph --> _generate
 ```
