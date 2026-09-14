@@ -20,5 +20,9 @@ end
 function weird_same_name()::Int
     return same_name() + 4
 end
+# two methods inside the same file
+function weird_same_name(x::Int)::Int
+    return Int(round(ϕψ_mean(x)))
+end
 
 end

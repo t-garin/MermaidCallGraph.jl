@@ -30,4 +30,5 @@ flowchart LR
     print_stuff --> get_super_string
     stuff_same_name --> same_name
     weird_same_name --> same_name
+    weird_same_name --> ϕψ_mean
 ```
