@@ -4,13 +4,17 @@ Parse the code to find:
 - imports
 - includes
 - exports
+- the module name, if the file defines one
 """
 function parse(path)
     defs_and_calls = Dict{String, Set{SyntaxNode}}()
+    modname = nothing
     tree = parseall(SyntaxNode, read(path, String))
     children = get_children(tree)
     # strip module if any
     if get_kind(children[1]) === "module"
+        # child 1 is the module name, child 2 is the block
+        modname = string(get_children(children[1])[1])
         tree = get_children(children[1])[2]
         children = get_children(tree)
         # module is defined in a block
@@ -65,5 +69,5 @@ function parse(path)
             defs_and_calls[func_name] = internal_calls
         end
     end
-    return defs_and_calls, imports, includes, exports
+    return defs_and_calls, imports, includes, exports, modname
 end

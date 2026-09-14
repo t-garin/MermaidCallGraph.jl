@@ -71,6 +71,8 @@ julia --project=. -e 'using MermaidCallGraph; mermaid_call_graph(input_dir="lib"
 ## Quirks
 
 - If multiple function methods are defined in the same file, they will be merged into one node.
+- Only explicit imports have a clear arrow pointing to a function, implicit imports have a "?"-marked arrow.
+- `include` is treated like an implicit import.
 
 ## Contributing
 

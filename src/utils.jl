@@ -80,3 +80,17 @@ function get_internal_calls!(node::SyntaxNode, calls::Set{SyntaxNode})::Nothing
         get_internal_calls!(child, calls)
     end
 end
+
+"""
+Get full function name: /path/to/file.jl:func_name
+"""
+function get_full_func_name(func_name, path, input_dir)
+    return replace(path, input_dir => "") * ":" * func_name
+end
+
+"""
+Return the module name from an importpath node like `..stuff` or `.math`.
+"""
+function get_import_module_name(node::SyntaxNode)::String
+    return string(get_children(node)[end])
+end

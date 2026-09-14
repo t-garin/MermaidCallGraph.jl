@@ -1,7 +1,6 @@
 module math
 export weird_same_name, broadcast_double_mean
-include("../misc/weird.jl")
-import .weird: same_name
+import ..weird: same_name
 
 ϕ(x) = ((1 + sqrt(5))/2) * x
 ψ(x) = ((1 - sqrt(5))/2) * x

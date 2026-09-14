@@ -1,7 +1,6 @@
 module io
 export stuff_same_name
-include("../misc/stuff.jl")
-import .stuff: same_name
+import ..stuff: same_name
 
 # call a function with same_name
 function stuff_same_name()
