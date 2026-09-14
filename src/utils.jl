@@ -63,6 +63,13 @@ function is_import(node::SyntaxNode)::Bool
 end
 
 """
+True if function include, False otherwise.
+"""
+function is_include(node::SyntaxNode)::Bool
+    return get_kind(node) === "call" ? string(node[1]) === "include" : false
+end
+
+"""
 Resursively finds all the calls in the lower nodes.
 """
 function get_internal_calls!(node::SyntaxNode, calls::Set{SyntaxNode})::Nothing

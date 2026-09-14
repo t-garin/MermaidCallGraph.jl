@@ -17,8 +17,8 @@ function mermaid_call_graph()
     # - function imports
     # - function exports
     for path in find_jl_files(input_dir)
-        defs_and_calls, imports, exports = parse(path)
-        print("\n\n\n", path, ":\n\n", defs_and_calls, "\n\n", imports, "\n\n", exports, "\n\n\n")
+        defs_and_calls, imports, includes, exports = parse(path)
+        print("\n\n\n", path, ":\n\n", defs_and_calls, "\n\n", imports, "\n\n", includes, "\n\n", exports, "\n\n\n")
     end
 end
 

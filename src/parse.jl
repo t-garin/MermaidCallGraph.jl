@@ -1,5 +1,9 @@
 """
-Find all functions defined per path.
+Parse the code to find:
+- function definitions and internal calls
+- imports
+- includes
+- exports
 """
 function parse(path)
     defs_and_calls = Dict{String, Set{SyntaxNode}}()
@@ -20,6 +24,11 @@ function parse(path)
         node for node in 
             get_children(tree)
             if is_import(node)
+    ]
+    includes = [
+        node for node in 
+            get_children(tree)
+            if is_include(node)
     ]
     exports = [
         node for node in 
@@ -56,5 +65,5 @@ function parse(path)
             defs_and_calls[func_name] = internal_calls
         end
     end
-    return defs_and_calls, imports, exports
+    return defs_and_calls, imports, includes, exports
 end
