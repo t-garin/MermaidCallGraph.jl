@@ -50,12 +50,31 @@ function is_function_call(node::SyntaxNode)::Bool
 end
 
 """
+True if function export, False otherwise.
+"""
+function is_export(node::SyntaxNode)::Bool
+    return get_kind(node) === "export" ? true : false
+end
+
+"""
+True if function import, False otherwise.
+"""
+function is_import(node::SyntaxNode)::Bool
+    kind = get_kind(node)
+    if (kind === "import") || (kind === "using")
+        return true
+    else
+        return false
+    end
+end
+
+"""
 Resursively finds all the calls in the lower nodes.
 """
-function get_internal_calls!(node::SyntaxNode, calls::Set{String})::Nothing
+function get_internal_calls!(node::SyntaxNode, calls::Set{SyntaxNode})::Nothing
     for child in get_children(node)
         if is_function_call(child)
-            push!(calls, string(child[1]))
+            push!(calls, child[1])
         end
         get_internal_calls!(child, calls)
     end
@@ -64,8 +83,8 @@ end
 """
 Find all functions defined per path.
 """
-function find_all_defined_functions(path::String)::Set{String}
-    functions_defined_in_this_file = Set{String}()
+function walk_ast(path)
+    defs_and_calls = Dict{String, Set{SyntaxNode}}()
     tree = parseall(SyntaxNode, read(path, String))
     children = get_children(tree)
     # strip module if any
@@ -79,6 +98,16 @@ function find_all_defined_functions(path::String)::Set{String}
             tree = get_children(children[2])[1]
         end
     end
+    imports = [
+        node for node in 
+            get_children(tree)
+            if is_import(node)
+    ]
+    exports = [
+        node for node in 
+            get_children(tree)
+            if is_export(node)
+    ]
     toplevel_function_definitions = [
         node for node in 
             get_children(tree)
@@ -86,20 +115,30 @@ function find_all_defined_functions(path::String)::Set{String}
     ]
     for func_def_node in toplevel_function_definitions
         # first child holds the function name
-        first_child = get_children(func_def_node)[1]
+        first_child, other_children... = get_children(func_def_node)
         # get the function name
         if get_kind(first_child) == "call"
             func_name = string(first_child[1])
         # if the call is nested
         # where clauses, type annotations ...
         else
-            first_child_calls = Set{String}()
+            first_child_calls = Set{SyntaxNode}()
             get_internal_calls!(first_child, first_child_calls)
             func_name = string(only(first_child_calls))
         end
-        push!(functions_defined_in_this_file, func_name)
+        # parse internal calls
+        internal_calls = Set{SyntaxNode}()
+        for child in other_children
+            get_internal_calls!(child, internal_calls)
+        end
+        # if multiple methods in the same file
+        if func_name in keys(defs_and_calls)
+            defs_and_calls[func_name] = union(defs_and_calls[func_name], internal_calls)
+        else
+            defs_and_calls[func_name] = internal_calls
+        end
     end
-    return functions_defined_in_this_file
+    return defs_and_calls, imports, exports
 end
 
 
@@ -107,9 +146,13 @@ end
 """
 function mermaid_call_graph()
     input_dir = "test/test_repo_1"
-    # walk the ast a first time for function defs
+    # walk the ast a to find:
+    # - function defs + bodies
+    # - function imports
+    # - function exports
     for path in find_jl_files(input_dir)
-        print(path, ": ", find_all_defined_functions(path), "\n")
+        defs_and_calls, imports, exports = walk_ast(path)
+        print("\n\n\n", path, ":\n\n", defs_and_calls, "\n\n", imports, "\n\n", exports, "\n\n\n")
     end
 end
 

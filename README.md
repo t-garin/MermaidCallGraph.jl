@@ -68,6 +68,10 @@ Or using keyword arguments:
 julia --project=. -e 'using MermaidCallGraph; mermaid_call_graph(input_dir="lib", output_file="graph.md", orientation="TB")'
 ```
 
+## Quirks
+
+- If multiple function methods are defined in the same file, they will be merged into one node.
+
 ## Contributing
 
 Any help, feedback, or improvement is welcome! Feel free to open an issue or
