@@ -8,6 +8,7 @@ export mermaid_call_graph
 include("utils.jl")
 include("parse.jl")
 include("scope.jl")
+include("edges.jl")
 
 """
 """
@@ -42,9 +43,11 @@ function mermaid_call_graph()
         ]
         print(imports, "\n")
         print(defs_and_calls, "\n")
-        functions_in_scope = get_imported_functions_in_scope(imports, module_paths, all_functions_defined, input_dir)
-        functions_in_scope = union(functions_in_scope, full_func_names)
-        print(functions_in_scope, "\n\n\n")
+        explicit_functions, implicit_functions = get_imported_functions_in_scope(imports, includes, module_paths, all_functions_defined, input_dir, path)
+        functions_in_scope = union(explicit_functions, implicit_functions, full_func_names)
+        print(functions_in_scope, "\n")
+        edges = get_edges(defs_and_calls, path, functions_in_scope, explicit_functions, implicit_functions, module_paths, input_dir)
+        print(edges, "\n\n\n")
     end
     print(all_functions_defined)
 
