@@ -8,6 +8,11 @@ using ..weird
 using .io: stuff_same_name
 import .math
 
+"""
+    main()
+
+Run all the test functions and print their output.
+"""
 function main()
     print_stuff()
     print("\n")

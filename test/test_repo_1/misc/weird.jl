@@ -14,6 +14,11 @@ function print_weird()
 end
 
 # test with generic type
+"""
+    f(x)
+
+Multiply `x` by 1312.
+"""
 function f(x::T)::T where {T}
     return x * 1312
 end

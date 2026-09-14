@@ -9,6 +9,11 @@ function same_name()::Int
 end
 
 # test with private function 
+"""
+    print_stuff()
+
+Print a super string.
+"""
 function print_stuff()
     function get_super_string()::String
         return "nuchnibi"

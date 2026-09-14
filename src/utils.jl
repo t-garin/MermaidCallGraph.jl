@@ -32,6 +32,21 @@ function is_function_definition(node::SyntaxNode)::Bool
 end
 
 """
+Return the function definition wrapped inside a docstring node, if any;
+otherwise return the node unchanged.
+"""
+function unwrap_doc(node::SyntaxNode)::SyntaxNode
+    if get_kind(node) === "doc"
+        for child in get_children(node)
+            if is_function_definition(child)
+                return child
+            end
+        end
+    end
+    return node
+end
+
+"""
 True if function call, False otherwise.
 """
 function is_function_call(node::SyntaxNode)::Bool

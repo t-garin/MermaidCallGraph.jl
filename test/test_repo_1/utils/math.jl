@@ -6,6 +6,11 @@ import ..weird: same_name
 ψ(x) = ((1 - sqrt(5))/2) * x
 
 # test non-ascii characterw
+"""
+    ϕψ_mean(x)
+
+Return the mean of `ϕ(x)` and `ψ(x)`.
+"""
 function ϕψ_mean(x)
     return (ϕ(x) + ψ(x))/2
 end
