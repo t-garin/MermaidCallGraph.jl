@@ -49,6 +49,9 @@ function is_function_call(node::SyntaxNode)::Bool
     end
 end
 
+"""
+Resursively finds all the calls in the lower nodes.
+"""
 function get_internal_calls!(node::SyntaxNode, calls::Set{String})::Nothing
     for child in get_children(node)
         if is_function_call(child)
@@ -59,42 +62,54 @@ function get_internal_calls!(node::SyntaxNode, calls::Set{String})::Nothing
 end
 
 """
+Find all functions defined per path.
+"""
+function find_all_defined_functions(path::String)::Set{String}
+    functions_defined_in_this_file = Set{String}()
+    tree = parseall(SyntaxNode, read(path, String))
+    children = get_children(tree)
+    # strip module if any
+    if get_kind(children[1]) === "module"
+        tree = get_children(children[1])[2]
+        children = get_children(tree)
+        # module is defined in a block
+        # arg 1 is the name, arg 2 is the block
+        if get_kind(children[2]) === "block"
+            # tree becomes the content of the block
+            tree = get_children(children[2])[1]
+        end
+    end
+    toplevel_function_definitions = [
+        node for node in 
+            get_children(tree)
+            if is_function_definition(node)
+    ]
+    for func_def_node in toplevel_function_definitions
+        # first child holds the function name
+        first_child = get_children(func_def_node)[1]
+        # get the function name
+        if get_kind(first_child) == "call"
+            func_name = string(first_child[1])
+        # if the call is nested
+        # where clauses, type annotations ...
+        else
+            first_child_calls = Set{String}()
+            get_internal_calls!(first_child, first_child_calls)
+            func_name = string(only(first_child_calls))
+        end
+        push!(functions_defined_in_this_file, func_name)
+    end
+    return functions_defined_in_this_file
+end
+
+
+"""
 """
 function mermaid_call_graph()
-
     input_dir = "test/test_repo_1"
+    # walk the ast a first time for function defs
     for path in find_jl_files(input_dir)
-        print(basename(path)*"\n")
-        
-        tree = parseall(SyntaxNode, read(path, String))
-        children = get_children(tree)
-
-        # strip module if any
-        if get_kind(children[1]) === "module"
-            tree = get_children(children[1])[2]
-            children = get_children(tree)
-            # module is defined in a block
-            # arg 1 is the name, arg 2 is the block
-            if get_kind(children[2]) === "block"
-                # tree becomes the content of the block
-                tree = get_children(children[2])[1]
-            end
-        end
- 
-        toplevel_function_definitions = [
-            node for node in 
-                get_children(tree)
-                if is_function_definition(node)
-            ]
-
-        #
-        for func_def_node in toplevel_function_definitions
-            calls = Set{String}()
-            print(func_def_node, "\n")
-            get_internal_calls!(func_def_node, calls)
-            print(calls)
-            print("\n\n\n")
-        end
+        print(path, ": ", find_all_defined_functions(path), "\n")
     end
 end
 
