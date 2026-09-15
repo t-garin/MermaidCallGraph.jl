@@ -2,11 +2,13 @@ include("misc/stuff.jl")
 include("misc/weird.jl")
 include("utils/io.jl")
 include("utils/math.jl")
+include("lib/geometry.jl")
 
 import ..stuff: print_stuff
 using ..weird
 using .io: stuff_same_name
 import .math
+import .geometry
 
 """
     main()
@@ -29,6 +31,8 @@ function main()
     print(weird.f(6769))
     print("\n")
     print(weird.f(6769.0))
+    print("\n")
+    print(geometry.polygon_perimeter([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0]]))
 end
 
 main()
