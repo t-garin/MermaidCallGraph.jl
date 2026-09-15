@@ -2,7 +2,8 @@
 Return the file path part of a full function name.
 """
 function get_full_func_path(full_name::String)::String
-    return split(full_name, ":")[1]
+    # split on the last `:` only, so Windows drive letters (e.g. `C:\...`) survive
+    return rsplit(full_name, ":", limit=2)[1]
 end
 
 """

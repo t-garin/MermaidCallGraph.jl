@@ -20,6 +20,7 @@ internal call graph to `output_file`. A positional variant
 """
 function mermaid_call_graph(; input_dir::String="src", output_file::String="MermaidCallGraph.md", orientation::String="LR")::Nothing
     paths = find_jl_files(input_dir)
+    isempty(paths) && @warn "no .jl files found under $(input_dir), nothing to do"
     # first pass:
     # - modules
     # - all function definitions
@@ -64,7 +65,7 @@ function mermaid_call_graph(; input_dir::String="src", output_file::String="Merm
         # functions of the files sharing this file's scope through includes
         scope_group_functions = get_scope_group_functions(scope_groups, all_functions_defined, rel_path)
         functions_in_scope = union(explicit_functions, implicit_functions, scope_group_functions, full_func_names)
-        edges = get_edges(defs_and_calls, path, functions_in_scope, explicit_functions, implicit_functions, module_paths, input_dir)
+        edges = get_edges(defs_and_calls, path, functions_in_scope, explicit_functions, implicit_functions, module_paths, all_functions_defined, input_dir)
         all_edges = union(all_edges, edges)
     end
     mermaid_markdown = generate_mermaid_markdown(all_functions_defined, all_edges, orientation)

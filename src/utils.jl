@@ -122,7 +122,9 @@ function get_function_name(sig::SyntaxNode)::String
     if kind == "Identifier"
         return string(sig)
     elseif kind == "call" || kind == "dotcall"
-        return string(sig[1])
+        callee = sig[1]
+        # callable objects: `(F::Foo)(x)` is a method of the type `Foo`
+        return get_kind(callee) === "::" ? string(get_children(callee)[end]) : string(callee)
     else
         return get_function_name(get_children(sig)[1])
     end
