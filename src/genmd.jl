@@ -29,7 +29,8 @@ end
 
 """
 Generate the Mermaid flowchart markdown from the repo functions and call edges.
-Edges are tuples (caller, callee, implicit); implicit edges use a dotted arrow.
+Edges are tuples (caller, callee, implicit); implicit edges use a dotted,
+"?"-marked arrow.
 """
 function generate_mermaid_markdown(all_functions, edges, orientation)
     lines = String["flowchart $(orientation)"]
@@ -41,7 +42,7 @@ function generate_mermaid_markdown(all_functions, edges, orientation)
         push!(lines, "    end")
     end
     for (caller, callee, implicit) in sort(collect(edges))
-        arrow = implicit ? "-.->" : "-->"
+        arrow = implicit ? "-. ? .->" : "-->"
         push!(lines, "    $(get_node_id(caller)) $arrow $(get_node_id(callee))")
     end
     return join(lines, "\n")

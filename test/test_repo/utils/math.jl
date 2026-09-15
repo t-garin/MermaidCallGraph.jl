@@ -29,4 +29,10 @@ function weird_same_name(x::Int)::Int
     return Int(round(ϕψ_mean(x)))
 end
 
+# recursive function: a call to itself is not drawn as an edge
+function fact(n)
+    n <= 1 && return 1
+    return n * fact(n - 1)
+end
+
 end

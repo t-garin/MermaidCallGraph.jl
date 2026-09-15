@@ -12,6 +12,9 @@ flowchart LR
     subgraph "/main.jl"
         _main_jl_main["main"]
     end
+    subgraph "/misc/ambig.jl"
+        _misc_ambig_jl_resolve["resolve"]
+    end
     subgraph "/misc/stuff.jl"
         _misc_stuff_jl_print_stuff["print_stuff"]
         _misc_stuff_jl_same_name["same_name"]
@@ -26,6 +29,7 @@ flowchart LR
     end
     subgraph "/utils/math.jl"
         _utils_math_jl_broadcast_double_mean["broadcast_double_mean"]
+        _utils_math_jl_fact["fact"]
         _utils_math_jl_weird_same_name["weird_same_name"]
         _utils_math_jl_u3c8["ψ"]
         _utils_math_jl_u3d5["ϕ"]
@@ -36,10 +40,12 @@ flowchart LR
     _main_jl_main --> _lib_geometry_jl_polygon_perimeter
     _main_jl_main --> _misc_stuff_jl_print_stuff
     _main_jl_main --> _misc_weird_jl_f
-    _main_jl_main -.-> _misc_weird_jl_print_weird
+    _main_jl_main -. ? .-> _misc_weird_jl_print_weird
     _main_jl_main --> _utils_io_jl_stuff_same_name
     _main_jl_main --> _utils_math_jl_broadcast_double_mean
     _main_jl_main --> _utils_math_jl_weird_same_name
+    _misc_ambig_jl_resolve -. ? .-> _misc_stuff_jl_same_name
+    _misc_ambig_jl_resolve -. ? .-> _misc_weird_jl_same_name
     _utils_io_jl_stuff_same_name --> _misc_stuff_jl_same_name
     _utils_math_jl_broadcast_double_mean --> _utils_math_jl_u3d5u3c8_mean
     _utils_math_jl_weird_same_name --> _misc_weird_jl_same_name
