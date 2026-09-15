@@ -57,13 +57,6 @@ function is_function_call(node::SyntaxNode)::Bool
 end
 
 """
-True if function export, False otherwise.
-"""
-function is_export(node::SyntaxNode)::Bool
-    return get_kind(node) === "export"
-end
-
-"""
 True if function import, False otherwise.
 """
 function is_import(node::SyntaxNode)::Bool
@@ -90,8 +83,8 @@ end
 """
 Get full function name: /path/to/file.jl:func_name
 """
-function get_full_func_name(func_name, path, input_dir)
-    return replace(path, input_dir => "") * ":" * func_name
+function get_full_func_name(func_name, rel_path)
+    return rel_path * ":" * func_name
 end
 
 """

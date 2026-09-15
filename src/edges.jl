@@ -24,10 +24,10 @@ end
 Return the call edges between repo-defined functions:
 (caller full name, callee full name, whether the edge is implicit).
 """
-function get_edges(defs_and_calls, path, functions_in_scope, explicit_functions, implicit_functions, module_paths, all_functions_defined, input_dir)
+function get_edges(defs_and_calls, rel_path, functions_in_scope, explicit_functions, implicit_functions, module_paths, all_functions_defined)
     edges = Set{Tuple{String, String, Bool}}()
     for (caller_name, callees) in defs_and_calls
-        caller_full = get_full_func_name(caller_name, path, input_dir)
+        caller_full = get_full_func_name(caller_name, rel_path)
         for callee in callees
             # function like import math; math.sin
             is_qualified = get_kind(callee) === "."

@@ -1,12 +1,23 @@
 """
-Parse the code to find:
+Parsed content of one source file.
+"""
+struct ParsedFile
+    path::String
+    rel_path::String
+    defs_and_calls::Dict{String, Set{SyntaxNode}}
+    imports::Vector{SyntaxNode}
+    includes::Vector{String}
+    modname::Union{Nothing, String}
+end
+
+"""
+Parse a file to find:
 - function definitions and internal calls
 - imports
-- includes
-- exports
+- includes (as normalized relative paths)
 - the module name, if the file defines one
 """
-function parse(path)
+function parse(path, input_dir)::ParsedFile
     defs_and_calls = Dict{String, Set{SyntaxNode}}()
     modname = nothing
     tree = parseall(SyntaxNode, read(path, String))
@@ -20,7 +31,6 @@ function parse(path)
     end
     imports = [node for node in get_children(tree) if is_import(node)]
     includes = [node for node in get_children(tree) if is_include(node)]
-    exports = [node for node in get_children(tree) if is_export(node)]
     # docstrings and macro-call wrappers (e.g. `@inline`, `@doc`) wrap their
     # target; unwrap them to find the function definitions
     toplevel_function_definitions = [
@@ -45,5 +55,10 @@ function parse(path)
             defs_and_calls[func_name] = internal_calls
         end
     end
-    return defs_and_calls, imports, includes, exports, modname
+    rel_path = replace(path, input_dir => "")
+    included_paths = [
+        normpath(joinpath(dirname(rel_path), strip(string(include[2][1]), ['"'])))
+        for include in includes
+    ]
+    return ParsedFile(path, rel_path, defs_and_calls, imports, included_paths, modname)
 end

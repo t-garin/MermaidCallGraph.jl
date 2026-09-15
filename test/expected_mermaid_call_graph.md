@@ -1,6 +1,9 @@
 ```mermaid
 flowchart LR
     subgraph "/MermaidCallGraph.jl"
+        _MermaidCallGraph_jl_build_mermaid_call_graph["build_mermaid_call_graph"]
+        _MermaidCallGraph_jl_collect_function_info["collect_function_info"]
+        _MermaidCallGraph_jl_compute_edges["compute_edges"]
         _MermaidCallGraph_jl_mermaid_call_graph["mermaid_call_graph"]
     end
     subgraph "/edges.jl"
@@ -29,21 +32,24 @@ flowchart LR
         _utils_jl_get_internal_calls_["get_internal_calls!"]
         _utils_jl_get_kind["get_kind"]
         _utils_jl_get_local_name["get_local_name"]
-        _utils_jl_is_export["is_export"]
         _utils_jl_is_function_call["is_function_call"]
         _utils_jl_is_function_definition["is_function_definition"]
         _utils_jl_is_import["is_import"]
         _utils_jl_is_include["is_include"]
         _utils_jl_unwrap_definition["unwrap_definition"]
     end
-    _MermaidCallGraph_jl_mermaid_call_graph --> _edges_jl_get_edges
-    _MermaidCallGraph_jl_mermaid_call_graph --> _genmd_jl_generate_mermaid_markdown
-    _MermaidCallGraph_jl_mermaid_call_graph --> _parse_jl_parse
-    _MermaidCallGraph_jl_mermaid_call_graph --> _scope_jl_compute_scope_groups
-    _MermaidCallGraph_jl_mermaid_call_graph --> _scope_jl_get_imported_functions_in_scope
-    _MermaidCallGraph_jl_mermaid_call_graph --> _scope_jl_get_scope_group_functions
+    _MermaidCallGraph_jl_build_mermaid_call_graph --> _MermaidCallGraph_jl_collect_function_info
+    _MermaidCallGraph_jl_build_mermaid_call_graph --> _MermaidCallGraph_jl_compute_edges
+    _MermaidCallGraph_jl_build_mermaid_call_graph --> _genmd_jl_generate_mermaid_markdown
+    _MermaidCallGraph_jl_build_mermaid_call_graph --> _parse_jl_parse
+    _MermaidCallGraph_jl_build_mermaid_call_graph --> _scope_jl_compute_scope_groups
+    _MermaidCallGraph_jl_collect_function_info --> _utils_jl_get_full_func_name
+    _MermaidCallGraph_jl_compute_edges --> _edges_jl_get_edges
+    _MermaidCallGraph_jl_compute_edges --> _scope_jl_get_imported_functions_in_scope
+    _MermaidCallGraph_jl_compute_edges --> _scope_jl_get_scope_group_functions
+    _MermaidCallGraph_jl_compute_edges --> _utils_jl_get_full_func_name
+    _MermaidCallGraph_jl_mermaid_call_graph --> _MermaidCallGraph_jl_build_mermaid_call_graph
     _MermaidCallGraph_jl_mermaid_call_graph --> _utils_jl_find_jl_files
-    _MermaidCallGraph_jl_mermaid_call_graph --> _utils_jl_get_full_func_name
     _edges_jl_get_callee_full_names --> _utils_jl_get_children
     _edges_jl_get_callee_full_names --> _utils_jl_get_kind
     _edges_jl_get_callee_full_names --> _utils_jl_get_local_name
@@ -57,7 +63,6 @@ flowchart LR
     _parse_jl_parse --> _utils_jl_get_function_name
     _parse_jl_parse --> _utils_jl_get_internal_calls_
     _parse_jl_parse --> _utils_jl_get_kind
-    _parse_jl_parse --> _utils_jl_is_export
     _parse_jl_parse --> _utils_jl_is_function_definition
     _parse_jl_parse --> _utils_jl_is_import
     _parse_jl_parse --> _utils_jl_is_include
@@ -71,7 +76,6 @@ flowchart LR
     _utils_jl_get_import_module_name --> _utils_jl_get_children
     _utils_jl_get_internal_calls_ --> _utils_jl_get_children
     _utils_jl_get_internal_calls_ --> _utils_jl_is_function_call
-    _utils_jl_is_export --> _utils_jl_get_kind
     _utils_jl_is_function_call --> _utils_jl_get_kind
     _utils_jl_is_function_definition --> _utils_jl_get_kind
     _utils_jl_is_import --> _utils_jl_get_kind

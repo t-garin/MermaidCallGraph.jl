@@ -1,7 +1,7 @@
 """
 Return the repo-defined functions in scope through the given imports.
 """
-function get_imported_functions_in_scope(imports, module_paths, all_functions_defined, input_dir)
+function get_imported_functions_in_scope(imports, module_paths, all_functions_defined)
     explicit_functions = Set{String}()
     implicit_functions = Set{String}()
     for imp in imports
@@ -14,7 +14,7 @@ function get_imported_functions_in_scope(imports, module_paths, all_functions_de
             if mod_path !== nothing
                 for func in funcs
                     func_name = string(get_children(func)[end])
-                    push!(explicit_functions, get_full_func_name(func_name, mod_path, input_dir))
+                    push!(explicit_functions, get_full_func_name(func_name, mod_path))
                 end
             end
         # implicit imports: only `using` brings all functions of the module in scope
@@ -42,9 +42,10 @@ Return, for each file, the set of files that share its scope through transitive
 scope roots; a module boundary is not crossed, so an included module file keeps
 its own scope.
 """
-function compute_scope_groups(paths, includes_by_path, modname_by_path, input_dir)
-    all_paths = Set(replace(path, input_dir => "") for path in paths)
-    is_module = Dict(rel => modname_by_path[rel] !== nothing for rel in all_paths)
+function compute_scope_groups(files)
+    all_paths = Set(file.rel_path for file in files)
+    includes_by_path = Dict(file.rel_path => file.includes for file in files)
+    is_module = Set(file.rel_path for file in files if file.modname !== nothing)
     included = Set{String}()
     for rel in all_paths, sub in includes_by_path[rel]
         push!(included, sub)
@@ -52,7 +53,7 @@ function compute_scope_groups(paths, includes_by_path, modname_by_path, input_di
     # roots are module files, which keep their own scope even when included (an
     # included module is never descended into, so it would otherwise get no group),
     # plus flat files that no one includes (script roots)
-    roots = [rel for rel in all_paths if is_module[rel] || !(rel in included)]
+    roots = [rel for rel in all_paths if rel in is_module || !(rel in included)]
     # gather a root and all flat files reachable from it through includes
     function collect_group!(file, group)
         # guard against cyclic includes (a -> b -> a), which would recurse forever
@@ -63,7 +64,7 @@ function compute_scope_groups(paths, includes_by_path, modname_by_path, input_di
             # or a nonexistent file); skip it instead of failing on is_module[sub]
             sub in all_paths || continue
             # do not cross module boundaries: an included module keeps its own scope
-            is_module[sub] || collect_group!(sub, group)
+            sub in is_module || collect_group!(sub, group)
         end
     end
     group_of = Dict{String, Set{String}}()
