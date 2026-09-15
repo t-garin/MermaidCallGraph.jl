@@ -46,18 +46,10 @@ function parse(path)
             if is_function_definition(unwrap_doc(node))
     ]
     for func_def_node in toplevel_function_definitions
-        # first child holds the function name
+        # first child holds the function signature (name + arguments)
         first_child, other_children... = get_children(func_def_node)
-        # get the function name
-        if get_kind(first_child) == "call"
-            func_name = string(first_child[1])
-        # if the call is nested
-        # where clauses, type annotations ...
-        else
-            first_child_calls = Set{SyntaxNode}()
-            get_internal_calls!(first_child, first_child_calls)
-            func_name = string(only(first_child_calls))
-        end
+        # get the function name, descending through where clauses, type annotations ...
+        func_name = get_function_name(first_child)
         # parse internal calls
         internal_calls = Set{SyntaxNode}()
         for child in other_children

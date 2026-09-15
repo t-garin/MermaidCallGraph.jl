@@ -109,3 +109,18 @@ Return the module name from an importpath node like `..stuff` or `.math`.
 function get_import_module_name(node::SyntaxNode)::String
     return string(get_children(node)[end])
 end
+
+"""
+Return the function name from a definition signature, descending through wrapper
+nodes (`where` clauses, return-type annotations) to the inner call or identifier.
+"""
+function get_function_name(sig::SyntaxNode)::String
+    kind = get_kind(sig)
+    if kind == "Identifier"
+        return string(sig)
+    elseif kind == "call" || kind == "dotcall"
+        return string(sig[1])
+    else
+        return get_function_name(get_children(sig)[1])
+    end
+end

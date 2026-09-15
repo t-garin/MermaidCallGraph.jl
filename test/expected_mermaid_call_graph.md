@@ -25,6 +25,7 @@ flowchart LR
         _utils_jl_find_jl_files["find_jl_files"]
         _utils_jl_get_children["get_children"]
         _utils_jl_get_full_func_name["get_full_func_name"]
+        _utils_jl_get_function_name["get_function_name"]
         _utils_jl_get_import_module_name["get_import_module_name"]
         _utils_jl_get_internal_calls_["get_internal_calls!"]
         _utils_jl_get_kind["get_kind"]
@@ -53,6 +54,7 @@ flowchart LR
     _genmd_jl_generate_mermaid_markdown --> _genmd_jl_get_full_func_path
     _genmd_jl_generate_mermaid_markdown --> _genmd_jl_get_node_id
     _parse_jl_parse --> _utils_jl_get_children
+    _parse_jl_parse --> _utils_jl_get_function_name
     _parse_jl_parse --> _utils_jl_get_internal_calls_
     _parse_jl_parse --> _utils_jl_get_kind
     _parse_jl_parse --> _utils_jl_is_export
@@ -64,6 +66,8 @@ flowchart LR
     _scope_jl_get_imported_functions_in_scope --> _utils_jl_get_full_func_name
     _scope_jl_get_imported_functions_in_scope --> _utils_jl_get_import_module_name
     _scope_jl_get_imported_functions_in_scope --> _utils_jl_get_kind
+    _utils_jl_get_function_name --> _utils_jl_get_children
+    _utils_jl_get_function_name --> _utils_jl_get_kind
     _utils_jl_get_import_module_name --> _utils_jl_get_children
     _utils_jl_get_internal_calls_ --> _utils_jl_get_children
     _utils_jl_get_internal_calls_ --> _utils_jl_is_function_call
