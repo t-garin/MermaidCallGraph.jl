@@ -1,7 +1,7 @@
 """
-Return the repo-defined functions in scope through the given imports and includes.
+Return the repo-defined functions in scope through the given imports.
 """
-function get_imported_functions_in_scope(imports, includes, module_paths, all_functions_defined, input_dir, path)
+function get_imported_functions_in_scope(imports, module_paths, all_functions_defined, input_dir)
     explicit_functions = Set{String}()
     implicit_functions = Set{String}()
     for imp in imports
@@ -33,15 +33,62 @@ function get_imported_functions_in_scope(imports, includes, module_paths, all_fu
             end
         end
     end
-    # includes are treated like implicit imports
-    for include in includes
-        include_target = strip(string(include[2][1]), ['"'])
-        included_path = normpath(joinpath(dirname(replace(path, input_dir => "")), include_target))
+    return explicit_functions, implicit_functions
+end
+
+"""
+Return, for each file, the set of files that share its scope through transitive
+`include`s. Files that define their own module, or that no file includes, are
+scope roots; a module boundary is not crossed, so an included module file keeps
+its own scope.
+"""
+function compute_scope_groups(paths, includes_by_path, modname_by_path, input_dir)
+    all_paths = Set(replace(path, input_dir => "") for path in paths)
+    is_module = Dict(rel => modname_by_path[rel] !== nothing for rel in all_paths)
+    included = Set{String}()
+    for rel in all_paths, sub in includes_by_path[rel]
+        push!(included, sub)
+    end
+    # roots are module files, which keep their own scope even when included (an
+    # included module is never descended into, so it would otherwise get no group),
+    # plus flat files that no one includes (script roots)
+    roots = [rel for rel in all_paths if is_module[rel] || !(rel in included)]
+    # gather a root and all flat files reachable from it through includes
+    function collect_group!(file, group)
+        # guard against cyclic includes (a -> b -> a), which would recurse forever
+        file in group && return
+        push!(group, file)
+        for sub in includes_by_path[file]
+            # an include may point outside the analyzed paths (e.g. ../external.jl
+            # or a nonexistent file); skip it instead of failing on is_module[sub]
+            sub in all_paths || continue
+            # do not cross module boundaries: an included module keeps its own scope
+            is_module[sub] || collect_group!(sub, group)
+        end
+    end
+    group_of = Dict{String, Set{String}}()
+    for root in roots
+        group = Set{String}()
+        collect_group!(root, group)
+        for file in group
+            # a flat file included by several modules belongs to all their groups
+            group_of[file] = union(get(group_of, file, Set{String}()), group)
+        end
+    end
+    return group_of
+end
+
+"""
+Return the full function names defined in the files sharing the given file's scope.
+"""
+function get_scope_group_functions(scope_groups, all_functions_defined, rel_path)
+    functions = Set{String}()
+    for rel in get(scope_groups, rel_path, Set{String}())
         for func_name in all_functions_defined
-            if startswith(func_name, included_path * ":")
-                push!(implicit_functions, func_name)
+            if startswith(func_name, rel * ":")
+                push!(functions, func_name)
             end
         end
     end
-    return explicit_functions, implicit_functions
+    return functions
 end
