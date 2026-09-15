@@ -32,14 +32,17 @@ function is_function_definition(node::SyntaxNode)::Bool
 end
 
 """
-Return the function definition wrapped inside a docstring node, if any;
-otherwise return the node unchanged.
+Return the function definition wrapped inside a docstring (`doc`) or macro-call
+(`macrocall`, e.g. `@inline`, `@noinline`, `@doc`) node, if any; otherwise
+return the node unchanged. Handles stacked wrappers recursively.
 """
-function unwrap_doc(node::SyntaxNode)::SyntaxNode
-    if get_kind(node) === "doc"
+function unwrap_definition(node::SyntaxNode)::SyntaxNode
+    kind = get_kind(node)
+    if kind === "doc" || kind === "macrocall"
         for child in get_children(node)
-            if is_function_definition(child)
-                return child
+            child_kind = get_kind(child)
+            if is_function_definition(child) || child_kind === "doc" || child_kind === "macrocall"
+                return unwrap_definition(child)
             end
         end
     end

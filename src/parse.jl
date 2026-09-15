@@ -39,11 +39,12 @@ function parse(path)
             get_children(tree)
             if is_export(node)
     ]
-    # docstrings wrap their target in a `doc` node; unwrap them to find functions
+    # docstrings and macro-call wrappers (e.g. `@inline`, `@doc`) wrap their
+    # target; unwrap them to find the function definitions
     toplevel_function_definitions = [
-        unwrap_doc(node) for node in 
+        unwrap_definition(node) for node in 
             get_children(tree)
-            if is_function_definition(unwrap_doc(node))
+            if is_function_definition(unwrap_definition(node))
     ]
     for func_def_node in toplevel_function_definitions
         # first child holds the function signature (name + arguments)

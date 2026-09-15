@@ -34,7 +34,7 @@ flowchart LR
         _utils_jl_is_function_definition["is_function_definition"]
         _utils_jl_is_import["is_import"]
         _utils_jl_is_include["is_include"]
-        _utils_jl_unwrap_doc["unwrap_doc"]
+        _utils_jl_unwrap_definition["unwrap_definition"]
     end
     _MermaidCallGraph_jl_mermaid_call_graph --> _edges_jl_get_edges
     _MermaidCallGraph_jl_mermaid_call_graph --> _genmd_jl_generate_mermaid_markdown
@@ -61,7 +61,7 @@ flowchart LR
     _parse_jl_parse --> _utils_jl_is_function_definition
     _parse_jl_parse --> _utils_jl_is_import
     _parse_jl_parse --> _utils_jl_is_include
-    _parse_jl_parse --> _utils_jl_unwrap_doc
+    _parse_jl_parse --> _utils_jl_unwrap_definition
     _scope_jl_get_imported_functions_in_scope --> _utils_jl_get_children
     _scope_jl_get_imported_functions_in_scope --> _utils_jl_get_full_func_name
     _scope_jl_get_imported_functions_in_scope --> _utils_jl_get_import_module_name
@@ -76,7 +76,7 @@ flowchart LR
     _utils_jl_is_function_definition --> _utils_jl_get_kind
     _utils_jl_is_import --> _utils_jl_get_kind
     _utils_jl_is_include --> _utils_jl_get_kind
-    _utils_jl_unwrap_doc --> _utils_jl_get_children
-    _utils_jl_unwrap_doc --> _utils_jl_get_kind
-    _utils_jl_unwrap_doc --> _utils_jl_is_function_definition
+    _utils_jl_unwrap_definition --> _utils_jl_get_children
+    _utils_jl_unwrap_definition --> _utils_jl_get_kind
+    _utils_jl_unwrap_definition --> _utils_jl_is_function_definition
 ```
