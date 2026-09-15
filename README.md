@@ -136,6 +136,7 @@ julia --project=. -e 'using MermaidCallGraph; mermaid_call_graph(input_dir="lib"
 - If multiple function methods are in scope at the same time, edges will be drawn towards all with a a "?"-marked arrow
 - Files `include`d into the same module or script share each other's functions; an included file that defines its own module keeps its own scope.
 - Recursive calls are not drawn: a function calling itself does not produce an edge.
+- Nested functions are not represented, and calls inside a nested function are attributed to the enclosing function.
 
 ## Contributing
 
