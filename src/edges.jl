@@ -36,6 +36,8 @@ function get_edges(defs_and_calls, path, functions_in_scope, explicit_functions,
             # function like import math; math.sin
             is_qualified = get_kind(callee) === "."
             for callee_full in get_callee_full_names(callee, functions_in_scope, module_paths)
+                # skip recursion: a call to itself is not an edge
+                callee_full == caller_full && continue
                 implicit = !is_qualified && callee_full in implicit_functions && !(callee_full in explicit_functions)
                 push!(edges, (caller_full, callee_full, implicit))
             end
