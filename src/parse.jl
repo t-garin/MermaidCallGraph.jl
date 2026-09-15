@@ -12,17 +12,11 @@ function parse(path)
     tree = parseall(SyntaxNode, read(path, String))
     children = get_children(tree)
     # strip module if any
-    if get_kind(children[1]) === "module"
-        # child 1 is the module name, child 2 is the block
-        modname = string(get_children(children[1])[1])
-        tree = get_children(children[1])[2]
+    if !isempty(children) && get_kind(children[1]) === "module"
+        # child 1 is the module name, child 2 is the body block
+        modname, tree = get_children(children[1])
+        modname = string(modname)
         children = get_children(tree)
-        # module is defined in a block
-        # arg 1 is the name, arg 2 is the block
-        if get_kind(children[2]) === "block"
-            # tree becomes the content of the block
-            tree = get_children(children[2])[1]
-        end
     end
     imports = [
         node for node in 
