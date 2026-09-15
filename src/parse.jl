@@ -18,27 +18,15 @@ function parse(path)
         modname = string(modname)
         children = get_children(tree)
     end
-    imports = [
-        node for node in 
-            get_children(tree)
-            if is_import(node)
-    ]
-    includes = [
-        node for node in 
-            get_children(tree)
-            if is_include(node)
-    ]
-    exports = [
-        node for node in 
-            get_children(tree)
-            if is_export(node)
-    ]
+    imports = [node for node in get_children(tree) if is_import(node)]
+    includes = [node for node in get_children(tree) if is_include(node)]
+    exports = [node for node in get_children(tree) if is_export(node)]
     # docstrings and macro-call wrappers (e.g. `@inline`, `@doc`) wrap their
     # target; unwrap them to find the function definitions
     toplevel_function_definitions = [
-        unwrap_definition(node) for node in 
-            get_children(tree)
-            if is_function_definition(unwrap_definition(node))
+        unwrap_definition(node)
+        for node in get_children(tree)
+        if is_function_definition(unwrap_definition(node))
     ]
     for func_def_node in toplevel_function_definitions
         # first child holds the function signature (name + arguments)
@@ -51,8 +39,8 @@ function parse(path)
             get_internal_calls!(child, internal_calls)
         end
         # if multiple methods in the same file
-        if func_name in keys(defs_and_calls)
-            defs_and_calls[func_name] = union(defs_and_calls[func_name], internal_calls)
+        if haskey(defs_and_calls, func_name)
+            union!(defs_and_calls[func_name], internal_calls)
         else
             defs_and_calls[func_name] = internal_calls
         end

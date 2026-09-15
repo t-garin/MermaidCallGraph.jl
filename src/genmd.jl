@@ -1,12 +1,4 @@
 """
-Return the file path part of a full function name.
-"""
-function get_full_func_path(full_name::String)::String
-    # split on the last `:` only, so Windows drive letters (e.g. `C:\...`) survive
-    return rsplit(full_name, ":", limit=2)[1]
-end
-
-"""
 Return a mermaid-safe node id for a full function name.
 Non-ASCII characters are encoded as `u` + their hex code point to keep ids unique.
 """

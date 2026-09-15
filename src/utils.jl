@@ -28,7 +28,7 @@ end
 True if function definition, False otherwise.
 """
 function is_function_definition(node::SyntaxNode)::Bool
-    return get_kind(node) === "function" ? true : false
+    return get_kind(node) === "function"
 end
 
 """
@@ -53,31 +53,21 @@ end
 True if function call, False otherwise.
 """
 function is_function_call(node::SyntaxNode)::Bool
-    kind = get_kind(node)
-    if (kind === "call") || (kind === "dotcall")
-        return true
-    else
-        return false
-    end
+    return get_kind(node) in ("call", "dotcall")
 end
 
 """
 True if function export, False otherwise.
 """
 function is_export(node::SyntaxNode)::Bool
-    return get_kind(node) === "export" ? true : false
+    return get_kind(node) === "export"
 end
 
 """
 True if function import, False otherwise.
 """
 function is_import(node::SyntaxNode)::Bool
-    kind = get_kind(node)
-    if (kind === "import") || (kind === "using")
-        return true
-    else
-        return false
-    end
+    return get_kind(node) in ("import", "using")
 end
 
 """
@@ -92,9 +82,7 @@ Resursively finds all the calls in the lower nodes.
 """
 function get_internal_calls!(node::SyntaxNode, calls::Set{SyntaxNode})::Nothing
     for child in get_children(node)
-        if is_function_call(child)
-            push!(calls, child[1])
-        end
+        is_function_call(child) && push!(calls, child[1])
         get_internal_calls!(child, calls)
     end
 end
@@ -104,6 +92,21 @@ Get full function name: /path/to/file.jl:func_name
 """
 function get_full_func_name(func_name, path, input_dir)
     return replace(path, input_dir => "") * ":" * func_name
+end
+
+"""
+Return the file path part of a full function name.
+"""
+function get_full_func_path(full_name::String)::String
+    # split on the last `:` only, so Windows drive letters (e.g. `C:\...`) survive
+    return rsplit(full_name, ":", limit=2)[1]
+end
+
+"""
+Return the local function name of a full function name.
+"""
+function get_local_name(full_name::String)::String
+    return split(full_name, ":")[end]
 end
 
 """

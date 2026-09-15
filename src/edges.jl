@@ -1,11 +1,4 @@
 """
-Return the local function name of a full function name.
-"""
-function get_local_name(full_name::String)::String
-    return split(full_name, ":")[end]
-end
-
-"""
 Return the repo-defined full function names a callee node can refer to.
 """
 function get_callee_full_names(callee, functions_in_scope, module_paths, all_functions_defined)

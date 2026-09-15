@@ -6,11 +6,9 @@ flowchart LR
     subgraph "/edges.jl"
         _edges_jl_get_callee_full_names["get_callee_full_names"]
         _edges_jl_get_edges["get_edges"]
-        _edges_jl_get_local_name["get_local_name"]
     end
     subgraph "/genmd.jl"
         _genmd_jl_generate_mermaid_markdown["generate_mermaid_markdown"]
-        _genmd_jl_get_full_func_path["get_full_func_path"]
         _genmd_jl_get_node_id["get_node_id"]
     end
     subgraph "/parse.jl"
@@ -25,10 +23,12 @@ flowchart LR
         _utils_jl_find_jl_files["find_jl_files"]
         _utils_jl_get_children["get_children"]
         _utils_jl_get_full_func_name["get_full_func_name"]
+        _utils_jl_get_full_func_path["get_full_func_path"]
         _utils_jl_get_function_name["get_function_name"]
         _utils_jl_get_import_module_name["get_import_module_name"]
         _utils_jl_get_internal_calls_["get_internal_calls!"]
         _utils_jl_get_kind["get_kind"]
+        _utils_jl_get_local_name["get_local_name"]
         _utils_jl_is_export["is_export"]
         _utils_jl_is_function_call["is_function_call"]
         _utils_jl_is_function_definition["is_function_definition"]
@@ -44,15 +44,15 @@ flowchart LR
     _MermaidCallGraph_jl_mermaid_call_graph --> _scope_jl_get_scope_group_functions
     _MermaidCallGraph_jl_mermaid_call_graph --> _utils_jl_find_jl_files
     _MermaidCallGraph_jl_mermaid_call_graph --> _utils_jl_get_full_func_name
-    _edges_jl_get_callee_full_names --> _edges_jl_get_local_name
     _edges_jl_get_callee_full_names --> _utils_jl_get_children
     _edges_jl_get_callee_full_names --> _utils_jl_get_kind
+    _edges_jl_get_callee_full_names --> _utils_jl_get_local_name
     _edges_jl_get_edges --> _edges_jl_get_callee_full_names
     _edges_jl_get_edges --> _utils_jl_get_full_func_name
     _edges_jl_get_edges --> _utils_jl_get_kind
-    _genmd_jl_generate_mermaid_markdown --> _edges_jl_get_local_name
-    _genmd_jl_generate_mermaid_markdown --> _genmd_jl_get_full_func_path
     _genmd_jl_generate_mermaid_markdown --> _genmd_jl_get_node_id
+    _genmd_jl_generate_mermaid_markdown --> _utils_jl_get_full_func_path
+    _genmd_jl_generate_mermaid_markdown --> _utils_jl_get_local_name
     _parse_jl_parse --> _utils_jl_get_children
     _parse_jl_parse --> _utils_jl_get_function_name
     _parse_jl_parse --> _utils_jl_get_internal_calls_
