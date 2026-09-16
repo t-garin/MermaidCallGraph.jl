@@ -12,10 +12,17 @@ function get_imported_functions_in_scope(imports, module_paths, all_functions_de
             # explicit import list: `using Mod: a, b` / `import Mod: a as b`
             if get_kind(child) === ":"
                 mod, funcs... = get_children(child)
-                mod_path = get(module_paths, get_import_module_name(mod), nothing)
+                mod_path = get(module_paths, string(get_children(mod)[end]), nothing)
                 mod_path === nothing && continue
                 for func in funcs
-                    func_name, alias = get_imported_name(func)
+                    if get_kind(func) === "as"
+                        original = get_children(func)[1]
+                        alias = string(get_children(func)[end])
+                        func_name = string(get_children(original)[end])
+                    else
+                        func_name = string(get_children(func)[end])
+                        alias = nothing
+                    end
                     full_name = get_full_func_name(func_name, mod_path)
                     full_name in all_functions_defined || continue
                     push!(explicit_functions, full_name)

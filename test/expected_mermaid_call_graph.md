@@ -30,15 +30,9 @@ flowchart LR
         _utils_jl_get_full_func_name["get_full_func_name"]
         _utils_jl_get_full_func_path["get_full_func_path"]
         _utils_jl_get_function_name["get_function_name"]
-        _utils_jl_get_import_module_name["get_import_module_name"]
-        _utils_jl_get_imported_name["get_imported_name"]
         _utils_jl_get_internal_calls_["get_internal_calls!"]
         _utils_jl_get_kind["get_kind"]
         _utils_jl_get_local_name["get_local_name"]
-        _utils_jl_is_function_call["is_function_call"]
-        _utils_jl_is_function_definition["is_function_definition"]
-        _utils_jl_is_import["is_import"]
-        _utils_jl_is_include["is_include"]
         _utils_jl_unwrap["unwrap"]
     end
     _MermaidCallGraph_jl_build_mermaid_call_graph --> _MermaidCallGraph_jl_collect_function_info
@@ -67,28 +61,16 @@ flowchart LR
     _parse_jl_parse --> _utils_jl_get_function_name
     _parse_jl_parse --> _utils_jl_get_internal_calls_
     _parse_jl_parse --> _utils_jl_get_kind
-    _parse_jl_parse --> _utils_jl_is_function_definition
-    _parse_jl_parse --> _utils_jl_is_import
-    _parse_jl_parse --> _utils_jl_is_include
     _parse_jl_parse --> _utils_jl_unwrap
     _scope_jl_get_imported_functions_in_scope --> _utils_jl_get_children
     _scope_jl_get_imported_functions_in_scope --> _utils_jl_get_full_func_name
-    _scope_jl_get_imported_functions_in_scope --> _utils_jl_get_import_module_name
-    _scope_jl_get_imported_functions_in_scope --> _utils_jl_get_imported_name
     _scope_jl_get_imported_functions_in_scope --> _utils_jl_get_kind
     _utils_jl_get_callee --> _utils_jl_get_children
     _utils_jl_get_function_name --> _utils_jl_get_children
     _utils_jl_get_function_name --> _utils_jl_get_kind
-    _utils_jl_get_import_module_name --> _utils_jl_get_children
-    _utils_jl_get_imported_name --> _utils_jl_get_children
-    _utils_jl_get_imported_name --> _utils_jl_get_kind
     _utils_jl_get_internal_calls_ --> _utils_jl_get_callee
     _utils_jl_get_internal_calls_ --> _utils_jl_get_children
-    _utils_jl_get_internal_calls_ --> _utils_jl_is_function_call
-    _utils_jl_is_function_call --> _utils_jl_get_kind
-    _utils_jl_is_function_definition --> _utils_jl_get_kind
-    _utils_jl_is_import --> _utils_jl_get_kind
-    _utils_jl_is_include --> _utils_jl_get_kind
+    _utils_jl_get_internal_calls_ --> _utils_jl_get_kind
     _utils_jl_unwrap --> _utils_jl_get_children
     _utils_jl_unwrap --> _utils_jl_get_kind
 ```

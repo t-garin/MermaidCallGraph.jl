@@ -25,13 +25,6 @@ function get_kind(node::SyntaxNode)::String
 end
 
 """
-True if function definition, False otherwise.
-"""
-function is_function_definition(node::SyntaxNode)::Bool
-    return get_kind(node) === "function"
-end
-
-"""
 Return the `target`-kind node (a function definition, a module, ...) wrapped
 inside docstring (`doc`) or macro-call (`macrocall`, e.g. `@inline`, `@doc`)
 nodes, if any; otherwise return the node unchanged. Handles stacked wrappers
@@ -51,13 +44,6 @@ function unwrap(node::SyntaxNode, target::String)::SyntaxNode
 end
 
 """
-True if function call, False otherwise.
-"""
-function is_function_call(node::SyntaxNode)::Bool
-    return get_kind(node) in ("call", "dotcall")
-end
-
-"""
 Return the callee node of a call: the first child, except for infix (`a + b`)
 and postfix (`x'`) calls where the operator is the second child.
 """
@@ -70,25 +56,11 @@ function get_callee(node::SyntaxNode)::SyntaxNode
 end
 
 """
-True if function import, False otherwise.
-"""
-function is_import(node::SyntaxNode)::Bool
-    return get_kind(node) in ("import", "using")
-end
-
-"""
-True if function include, False otherwise.
-"""
-function is_include(node::SyntaxNode)::Bool
-    return get_kind(node) === "call" ? string(node[1]) === "include" : false
-end
-
-"""
 Resursively finds all the calls in the lower nodes.
 """
 function get_internal_calls!(node::SyntaxNode, calls::Set{SyntaxNode})::Nothing
     for child in get_children(node)
-        is_function_call(child) && push!(calls, get_callee(child))
+        get_kind(child) in ("call", "dotcall") && push!(calls, get_callee(child))
         get_internal_calls!(child, calls)
     end
 end
@@ -114,26 +86,6 @@ Return the local function name of a full function name.
 function get_local_name(full_name::String)::String
     # split on the last `:` only, so names or paths containing `:` survive
     return rsplit(full_name, ":", limit=2)[end]
-end
-
-"""
-Return the module name from an importpath node like `..stuff` or `.math`.
-"""
-function get_import_module_name(node::SyntaxNode)::String
-    return string(get_children(node)[end])
-end
-
-"""
-Return the (imported name, alias) of one item of an explicit import list. The
-alias is `nothing` for plain imports; `import Mod: a as b` gives `("a", "b")`.
-"""
-function get_imported_name(func::SyntaxNode)
-    if get_kind(func) === "as"
-        original = get_children(func)[1]
-        alias = string(get_children(func)[end])
-        return string(get_children(original)[end]), alias
-    end
-    return string(get_children(func)[end]), nothing
 end
 
 """
