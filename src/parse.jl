@@ -39,7 +39,7 @@ function parse(path, input_dir)::ParsedFile
         children = get_children(tree)
     end
     imports = [node for node in get_children(tree) if get_kind(node) in ("import", "using")]
-    includes = [node for node in get_children(tree) if get_kind(node) === "call" && string(node[1]) === "include"]
+    includes = [node for node in get_children(tree) if get_kind(node) === "call" && get_function_name(node) === "include"]
     # docstrings and macro-call wrappers (e.g. `@inline`, `@doc`) wrap their
     # target; unwrap them to find the function definitions
     toplevel_function_definitions = [
