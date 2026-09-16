@@ -84,17 +84,6 @@ flowchart LR
     _utils_jl_unwrap --> _utils_jl_get_children
     _utils_jl_unwrap --> _utils_jl_get_kind
 ```
-
-
-
-
-
-
-
-
-
-
-
 ## Usage
 
 From the project root, run:
