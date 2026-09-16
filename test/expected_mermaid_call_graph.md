@@ -1,15 +1,3 @@
-# MermaidCallGraph.jl
-
-[![Build Status](https://github.com/t-garin/MermaidCallGraph.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/t-garin/MermaidCallGraph.jl/actions/workflows/CI.yml?query=branch%3Amain)
-
-## Description
-
-MermaidCallGraph.jl analyzes a Julia project's source code and generates a
-[Mermaid](https://mermaid.js.org/) flowchart of the internal call graph: which
-functions call which other functions. It creates one subgraph per source file,
-grouping the functions defined in that file, and draws edges for calls between
-functions of the project.
-
 ```mermaid
 flowchart LR
     subgraph "/MermaidCallGraph.jl"
@@ -103,62 +91,3 @@ flowchart LR
     _utils_jl_unwrap --> _utils_jl_get_children
     _utils_jl_unwrap --> _utils_jl_get_kind
 ```
-## Usage
-
-From the project root, run:
-
-```bash
-julia --project=. -e 'using MermaidCallGraph; mermaid_call_graph()'
-```
-
-This analyzes all Julia files under `src/` and writes `MermaidCallGraph.md` in
-the current directory.
-
-### Arguments
-
-`mermaid_call_graph` accepts three optional keyword arguments:
-
-| Argument      | Default                 | Description                                 |
-|---------------|-------------------------|---------------------------------------------|
-| `input_dir`   | `"src"`                 | Directory to scan for `.jl` files           |
-| `output_file` | `"MermaidCallGraph.md"` | Output markdown file                        |
-| `orientation` | `"LR"`                  | Mermaid graph orientation (e.g. `LR`, `TD`) |
-
-### Examples
-
-```bash
-julia --project=. -e 'using MermaidCallGraph; mermaid_call_graph("lib", "callgraph.md", "TD")'
-```
-
-Or using keyword arguments:
-
-```bash
-julia --project=. -e 'using MermaidCallGraph; mermaid_call_graph(input_dir="lib", output_file="graph.md", orientation="TB")'
-```
-
-## Quirks
-
-These quirks are not set in stone, feel free to submit a PR or issue if you want some behaviour fixed.
-
-- If multiple function methods are defined in the same file, they will be merged into one node.
-- A "?"-marked arrow means the call is ambiguous: several same-named functions are in scope, so an edge is drawn to each of them.
-- A clear arrow means the callee is uniquely resolved (single same-scope definition, explicit import, or qualified call).
-- Files `include`d into the same module or script share each other's functions; an included file that defines its own module keeps its own scope.
-- Recursive calls are not drawn: a function calling itself does not produce an edge.
-- Nested functions are not represented, and calls inside a nested function are attributed to the enclosing function.
-- Struct and abstract-type definitions are not represented as nodes; a plain constructor call (`Point(...)`) draws no edge.
-- A callable struct (`(f::Point)(k)`) registers the type name as a function, so any `Point(...)` call — including default-constructor calls — draws an edge to that method (resolution is name-based, dispatch is not modeled); the constructor call inside the method itself is treated as self-recursion and not drawn.
-- Files that fail to parse are skipped with a warning instead of aborting the whole analysis.
-- Only string-literal `include`s are resolved: `include("a.jl")`, `Base.include("a.jl")`, and the module-qualified forms `include(mod, "a.jl")` / `Base.include(mod, "a.jl")`; any other form (`include()`, `include(joinpath(...))`, interpolated strings) is ignored with a warning.
-- Chained comparisons (`a < b < c`, `a == b == c`) are not recognized as calls, so no edge is drawn even if the project defines the operator.
-- Only the first top-level `module` in a file is analyzed; code after it (including other `module` blocks) is ignored, and functions inside nested modules are not analyzed.
-- Duplicate module names across files collide: only the last one parsed is remembered, so imports of the other may resolve to nothing or to the wrong file.
-- Code inside quoted expressions (`:(...)`, e.g. in `@eval` or generated-function bodies) is treated as executed, which can draw edges for calls that never run.
-- Inner constructors (`struct Box; Box(x) = ...; end`) are not represented, and constructor calls draw no edge.
-
-## Contributing
-
-Any help, feedback, or improvement is welcome! Feel free to open an issue or
-submit a pull request on [GitHub](https://github.com/t-garin/MermaidCallGraph.jl).
-
-This is my first-ever public and registered repo, I've probably made some mistakes, don't hesitate to point them out!
