@@ -1,5 +1,5 @@
 module stuff
-export same_name, print_stuff
+export same_name, print_stuff, twice
 
 # test with functions that have
 # the same name in different files
@@ -22,8 +22,10 @@ function print_stuff()
 end
 
 # macro definition: `macro` blocks are not function nodes, so not drawn
+# doubles its argument by adding it to itself, so it also exercises the
+# repo-defined `Base.:+` method on `Point` at runtime
 macro twice(expr)
-    return esc(:(2 * $expr))
+    return esc(:($expr + $expr))
 end
 
 # abstract types define no function nodes

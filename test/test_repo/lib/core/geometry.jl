@@ -1,6 +1,7 @@
 module geometry
 # qualified include: must be detected as an include of shapes.jl
-Base.include("../shapes.jl")
+# (the module-qualified two-argument form is also valid Julia)
+Base.include(@__MODULE__, "../shapes.jl")
 import ..stuff: same_name
 
 # explicit import of a same-named function: clear edge to stuff.same_name

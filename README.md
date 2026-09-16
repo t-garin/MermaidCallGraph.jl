@@ -130,7 +130,7 @@ These quirks are not set in stone, feel free to submit a PR or issue if you want
 - Struct and abstract-type definitions are not represented as nodes; a plain constructor call (`Point(...)`) draws no edge.
 - A callable struct (`(f::Point)(k)`) registers the type name as a function, so any `Point(...)` call — including default-constructor calls — draws an edge to that method (resolution is name-based, dispatch is not modeled); the constructor call inside the method itself is treated as self-recursion and not drawn.
 - Files that fail to parse are skipped with a warning instead of aborting the whole analysis.
-- Only string-literal `include`s (`include("a.jl")`, `Base.include("a.jl")`) are resolved; any other form (`include()`, `include(joinpath(...))`, interpolated strings) is ignored with a warning.
+- Only string-literal `include`s are resolved: `include("a.jl")`, `Base.include("a.jl")`, and the module-qualified forms `include(mod, "a.jl")` / `Base.include(mod, "a.jl")`; any other form (`include()`, `include(joinpath(...))`, interpolated strings) is ignored with a warning.
 - Chained comparisons (`a < b < c`, `a == b == c`) are not recognized as calls, so no edge is drawn even if the project defines the operator.
 - Only the first top-level `module` in a file is analyzed; code after it (including other `module` blocks) is ignored, and functions inside nested modules are not analyzed.
 - Duplicate module names across files collide: only the last one parsed is remembered, so imports of the other may resolve to nothing or to the wrong file.

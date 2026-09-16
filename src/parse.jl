@@ -72,19 +72,27 @@ function parse(path, input_dir)::ParsedFile
             defs_and_calls[func_name] = internal_calls
         end
     end
-    # only string-literal includes can be resolved statically, e.g.
-    # `include("a.jl")` or `Base.include("a.jl")`; any other form
-    # (`include()`, `Base.include(Main, "a.jl")`, `include(joinpath(...))`,
-    # interpolated strings) is skipped with a warning instead of crashing
+    # only string-literal includes can be resolved statically. The path is the
+    # plain string-literal argument, wherever it appears: `include("a.jl")`,
+    # `Base.include("a.jl")`, or the module-qualified forms
+    # `include(mod, "a.jl")` / `Base.include(mod, "a.jl")`. Anything else
+    # (`include()`, `include(joinpath(...))`, interpolated strings) is skipped
+    # with a warning instead of crashing
     included_paths = String[]
     for include in includes
         args = get_children(include)
-        is_literal = length(args) >= 2 && get_kind(args[2]) === "string" && length(get_children(args[2])) == 1
-        if !is_literal
-            @warn "skipping include call in $(rel_path): only string-literal includes are resolved"
+        path_arg = nothing
+        for arg in args[2:end]
+            if get_kind(arg) === "string" && length(get_children(arg)) == 1
+                path_arg = arg
+                break
+            end
+        end
+        if path_arg === nothing
+            @warn "skipping include call in $(rel_path): no string-literal include path found"
             continue
         end
-        push!(included_paths, normpath(joinpath(dirname(rel_path), strip(string(args[2][1]), ['"']))))
+        push!(included_paths, normpath(joinpath(dirname(rel_path), strip(string(path_arg[1]), ['"']))))
     end
     return ParsedFile(rel_path, defs_and_calls, imports, included_paths, modname)
 end

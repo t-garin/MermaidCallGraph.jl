@@ -2,7 +2,11 @@
 using ..stuff
 
 module weird
-export same_name, print_weird
+export same_name, print_weird, Point, describe_point, shift
+# `@twice` comes from `stuff`; the top-level `using ..stuff` above only
+# affects `Main`, and `using` does not import macros, so import it explicitly
+using ..stuff
+import ..stuff: @twice
 
 # test with functions that have
 # the same name in different files
