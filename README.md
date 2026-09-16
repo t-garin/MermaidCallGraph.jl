@@ -41,6 +41,7 @@ flowchart LR
         _utils_jl_get_full_func_path["get_full_func_path"]
         _utils_jl_get_function_name["get_function_name"]
         _utils_jl_get_import_module_name["get_import_module_name"]
+        _utils_jl_get_imported_name["get_imported_name"]
         _utils_jl_get_internal_calls_["get_internal_calls!"]
         _utils_jl_get_kind["get_kind"]
         _utils_jl_get_local_name["get_local_name"]
@@ -82,10 +83,13 @@ flowchart LR
     _scope_jl_get_imported_functions_in_scope --> _utils_jl_get_children
     _scope_jl_get_imported_functions_in_scope --> _utils_jl_get_full_func_name
     _scope_jl_get_imported_functions_in_scope --> _utils_jl_get_import_module_name
+    _scope_jl_get_imported_functions_in_scope --> _utils_jl_get_imported_name
     _scope_jl_get_imported_functions_in_scope --> _utils_jl_get_kind
     _utils_jl_get_function_name --> _utils_jl_get_children
     _utils_jl_get_function_name --> _utils_jl_get_kind
     _utils_jl_get_import_module_name --> _utils_jl_get_children
+    _utils_jl_get_imported_name --> _utils_jl_get_children
+    _utils_jl_get_imported_name --> _utils_jl_get_kind
     _utils_jl_get_internal_calls_ --> _utils_jl_get_children
     _utils_jl_get_internal_calls_ --> _utils_jl_is_function_call
     _utils_jl_is_function_call --> _utils_jl_get_kind

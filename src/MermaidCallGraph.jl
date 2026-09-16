@@ -61,14 +61,14 @@ Compute all call edges between repo-defined functions.
 function compute_edges(files, module_paths, all_functions_defined, scope_groups)
     all_edges = Set{Tuple{String, String, Bool}}()
     for file in files
-        explicit_functions, implicit_functions = get_imported_functions_in_scope(file.imports, module_paths, all_functions_defined)
+        explicit_functions, implicit_functions, aliases = get_imported_functions_in_scope(file.imports, module_paths, all_functions_defined)
         functions_in_scope = union(
             explicit_functions,
             implicit_functions,
             get_scope_group_functions(scope_groups, all_functions_defined, file.rel_path),
             (get_full_func_name(name, file.rel_path) for name in keys(file.defs_and_calls)),
         )
-        union!(all_edges, get_edges(file.defs_and_calls, file.rel_path, functions_in_scope, explicit_functions, implicit_functions, module_paths, all_functions_defined))
+        union!(all_edges, get_edges(file.defs_and_calls, file.rel_path, functions_in_scope, aliases, explicit_functions, implicit_functions, module_paths, all_functions_defined))
     end
     return all_edges
 end

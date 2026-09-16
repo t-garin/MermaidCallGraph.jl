@@ -110,6 +110,19 @@ function get_import_module_name(node::SyntaxNode)::String
 end
 
 """
+Return the (imported name, alias) of one item of an explicit import list. The
+alias is `nothing` for plain imports; `import Mod: a as b` gives `("a", "b")`.
+"""
+function get_imported_name(func::SyntaxNode)
+    if get_kind(func) === "as"
+        original = get_children(func)[1]
+        alias = string(get_children(func)[end])
+        return string(get_children(original)[end]), alias
+    end
+    return string(get_children(func)[end]), nothing
+end
+
+"""
 Return the function name from a definition signature, descending through wrapper
 nodes (`where` clauses, return-type annotations) to the inner call or identifier.
 """

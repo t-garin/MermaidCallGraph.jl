@@ -1,39 +1,54 @@
 """
-Return the repo-defined functions in scope through the given imports.
+Return the repo-defined functions in scope through the given imports, and the
+name aliases introduced by `as` imports (alias → full function name).
 """
 function get_imported_functions_in_scope(imports, module_paths, all_functions_defined)
     explicit_functions = Set{String}()
     implicit_functions = Set{String}()
+    aliases = Dict{String, Set{String}}()
     for imp in imports
-        first_child, other_children... = get_children(imp)
-        # explicit imports
-        if get_kind(first_child) === ":"
-            mod, funcs... = get_children(first_child)
-            mod_name = get_import_module_name(mod)
-            mod_path = get(module_paths, mod_name, nothing)
-            if mod_path !== nothing
+        # a `using`/`import` statement can name several modules (`using A, B`)
+        for child in get_children(imp)
+            # explicit import list: `using Mod: a, b` / `import Mod: a as b`
+            if get_kind(child) === ":"
+                mod, funcs... = get_children(child)
+                mod_path = get(module_paths, get_import_module_name(mod), nothing)
+                mod_path === nothing && continue
                 for func in funcs
-                    func_name = string(get_children(func)[end])
-                    push!(explicit_functions, get_full_func_name(func_name, mod_path))
+                    func_name, alias = get_imported_name(func)
+                    full_name = get_full_func_name(func_name, mod_path)
+                    full_name in all_functions_defined || continue
+                    push!(explicit_functions, full_name)
+                    if alias !== nothing
+                        push!(get!(aliases, alias, Set{String}()), full_name)
+                    end
                 end
-            end
-        # implicit imports: only `using` brings all functions of the module in scope
-        else
-            if get_kind(imp) !== "using"
-                continue
-            end
-            mod_name = get_import_module_name(first_child)
-            mod_path = get(module_paths, mod_name, nothing)
-            if mod_path !== nothing
-                for func_name in all_functions_defined
-                    if startswith(func_name, mod_path * ":")
-                        push!(implicit_functions, func_name)
+            # single-module import: `using A` (implicit) or `import Mod.func` (explicit)
+            else
+                # relative markers (`.`, `..`) are children too; keep the identifiers
+                identifiers = [c for c in get_children(child) if get_kind(c) === "Identifier"]
+                # `import Mod.func`: several identifiers, import the last from the first
+                if length(identifiers) > 1
+                    get_kind(imp) === "import" || continue
+                    mod_path = get(module_paths, string(identifiers[1]), nothing)
+                    mod_path === nothing && continue
+                    full_name = get_full_func_name(string(identifiers[end]), mod_path)
+                    full_name in all_functions_defined && push!(explicit_functions, full_name)
+                # `using A`: implicit import of every function of the module
+                else
+                    get_kind(imp) === "using" || continue
+                    mod_path = get(module_paths, string(identifiers[1]), nothing)
+                    mod_path === nothing && continue
+                    for func_name in all_functions_defined
+                        if startswith(func_name, mod_path * ":")
+                            push!(implicit_functions, func_name)
+                        end
                     end
                 end
             end
         end
     end
-    return explicit_functions, implicit_functions
+    return explicit_functions, implicit_functions, aliases
 end
 
 """
