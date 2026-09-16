@@ -32,40 +32,22 @@ function is_function_definition(node::SyntaxNode)::Bool
 end
 
 """
-Return the function definition wrapped inside a docstring (`doc`) or macro-call
-(`macrocall`, e.g. `@inline`, `@noinline`, `@doc`) node, if any; otherwise
-return the node unchanged. Handles stacked wrappers recursively.
+Return the `target`-kind node (a function definition, a module, ...) wrapped
+inside docstring (`doc`) or macro-call (`macrocall`, e.g. `@inline`, `@doc`)
+nodes, if any; otherwise return the node unchanged. Handles stacked wrappers
+recursively.
 """
-function unwrap_definition(node::SyntaxNode)::SyntaxNode
+function unwrap(node::SyntaxNode, target::String)::SyntaxNode
     kind = get_kind(node)
     if kind === "doc" || kind === "macrocall"
         for child in get_children(node)
             child_kind = get_kind(child)
-            if is_function_definition(child) || child_kind === "doc" || child_kind === "macrocall"
-                return unwrap_definition(child)
+            if child_kind === target || child_kind === "doc" || child_kind === "macrocall"
+                return unwrap(child, target)
             end
         end
     end
     return node
-end
-
-"""
-Return the module node wrapped inside a docstring (`doc`) or macro-call
-(`macrocall`) node, if any; return the node itself when it is a module, and
-`nothing` otherwise. Handles stacked wrappers recursively.
-"""
-function unwrap_module(node::SyntaxNode)::Union{SyntaxNode, Nothing}
-    kind = get_kind(node)
-    if kind === "doc" || kind === "macrocall"
-        for child in get_children(node)
-            child_kind = get_kind(child)
-            if child_kind === "module" || child_kind === "doc" || child_kind === "macrocall"
-                return unwrap_module(child)
-            end
-        end
-        return nothing
-    end
-    return kind === "module" ? node : nothing
 end
 
 """

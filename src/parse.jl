@@ -24,10 +24,10 @@ function parse(path, input_dir)::ParsedFile
     children = get_children(tree)
     # strip module if any (may be wrapped in a docstring or macro call)
     if !isempty(children)
-        modnode = unwrap_module(children[1])
-        if modnode !== nothing
+        first = unwrap(children[1], "module")
+        if get_kind(first) === "module"
             # child 1 is the module name, child 2 is the body block
-            modname, tree = get_children(modnode)
+            modname, tree = get_children(first)
             modname = string(modname)
             children = get_children(tree)
         end
@@ -37,9 +37,9 @@ function parse(path, input_dir)::ParsedFile
     # docstrings and macro-call wrappers (e.g. `@inline`, `@doc`) wrap their
     # target; unwrap them to find the function definitions
     toplevel_function_definitions = [
-        unwrap_definition(node)
+        unwrap(node, "function")
         for node in get_children(tree)
-        if is_function_definition(unwrap_definition(node))
+        if is_function_definition(unwrap(node, "function"))
     ]
     for func_def_node in toplevel_function_definitions
         # first child holds the function signature (name + arguments)
