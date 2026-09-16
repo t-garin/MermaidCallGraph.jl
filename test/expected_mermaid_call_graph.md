@@ -51,7 +51,6 @@ flowchart LR
     _edges_jl_get_callee_full_names --> _utils_jl_get_local_name
     _edges_jl_get_edges --> _edges_jl_get_callee_full_names
     _edges_jl_get_edges --> _utils_jl_get_full_func_name
-    _edges_jl_get_edges --> _utils_jl_get_kind
     _genmd_jl_assign_node_ids --> _genmd_jl_get_node_id
     _genmd_jl_generate_mermaid_markdown --> _genmd_jl_assign_node_ids
     _genmd_jl_generate_mermaid_markdown --> _utils_jl_get_full_func_path

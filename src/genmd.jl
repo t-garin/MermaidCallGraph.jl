@@ -45,7 +45,7 @@ end
 
 """
 Generate the Mermaid flowchart markdown from the repo functions and call edges.
-Edges are tuples (caller, callee, implicit); implicit edges use a dotted,
+Edges are tuples (caller, callee, ambiguous); ambiguous edges use a dotted,
 "?"-marked arrow.
 """
 function generate_mermaid_markdown(all_functions, edges, orientation)

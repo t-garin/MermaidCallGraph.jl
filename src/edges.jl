@@ -24,20 +24,21 @@ end
 
 """
 Return the call edges between repo-defined functions:
-(caller full name, callee full name, whether the edge is implicit).
+(caller full name, callee full name, whether the call is ambiguous).
+An edge is ambiguous when several same-named functions are in scope, so we
+cannot tell which one is actually called.
 """
-function get_edges(defs_and_calls, rel_path, functions_in_scope, aliases, explicit_functions, implicit_functions, module_paths, all_functions_defined)
+function get_edges(defs_and_calls, rel_path, functions_in_scope, aliases, module_paths, all_functions_defined)
     edges = Set{Tuple{String, String, Bool}}()
     for (caller_name, callees) in defs_and_calls
         caller_full = get_full_func_name(caller_name, rel_path)
         for callee in callees
-            # function like import math; math.sin
-            is_qualified = get_kind(callee) === "."
-            for callee_full in get_callee_full_names(callee, functions_in_scope, aliases, module_paths, all_functions_defined)
+            candidates = get_callee_full_names(callee, functions_in_scope, aliases, module_paths, all_functions_defined)
+            ambiguous = length(candidates) > 1
+            for callee_full in candidates
                 # skip recursion: a call to itself is not an edge
                 callee_full == caller_full && continue
-                implicit = !is_qualified && callee_full in implicit_functions && !(callee_full in explicit_functions)
-                push!(edges, (caller_full, callee_full, implicit))
+                push!(edges, (caller_full, callee_full, ambiguous))
             end
         end
     end

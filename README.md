@@ -63,7 +63,6 @@ flowchart LR
     _edges_jl_get_callee_full_names --> _utils_jl_get_local_name
     _edges_jl_get_edges --> _edges_jl_get_callee_full_names
     _edges_jl_get_edges --> _utils_jl_get_full_func_name
-    _edges_jl_get_edges --> _utils_jl_get_kind
     _genmd_jl_assign_node_ids --> _genmd_jl_get_node_id
     _genmd_jl_generate_mermaid_markdown --> _genmd_jl_assign_node_ids
     _genmd_jl_generate_mermaid_markdown --> _utils_jl_get_full_func_path
@@ -85,6 +84,7 @@ flowchart LR
     _utils_jl_unwrap --> _utils_jl_get_children
     _utils_jl_unwrap --> _utils_jl_get_kind
 ```
+
 
 
 
@@ -131,8 +131,8 @@ julia --project=. -e 'using MermaidCallGraph; mermaid_call_graph(input_dir="lib"
 ## Quirks
 
 - If multiple function methods are defined in the same file, they will be merged into one node.
-- Only explicit imports have a clear arrow pointing to a function, implicit imports have a "?"-marked arrow.
-- If multiple function methods are in scope at the same time, edges will be drawn towards all with a a "?"-marked arrow
+- A "?"-marked arrow means the call is ambiguous: several same-named functions are in scope, so an edge is drawn to each of them.
+- A clear arrow means the callee is uniquely resolved (single same-scope definition, explicit import, or qualified call).
 - Files `include`d into the same module or script share each other's functions; an included file that defines its own module keeps its own scope.
 - Recursive calls are not drawn: a function calling itself does not produce an edge.
 - Nested functions are not represented, and calls inside a nested function are attributed to the enclosing function.

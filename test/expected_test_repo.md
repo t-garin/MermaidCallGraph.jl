@@ -43,13 +43,13 @@ flowchart LR
     _main_jl_main --> _lib_geometry_jl_polygon_perimeter
     _main_jl_main --> _misc_stuff_jl_print_stuff
     _main_jl_main --> _misc_weird_jl_f
-    _main_jl_main -. ? .-> _misc_weird_jl_print_weird
+    _main_jl_main --> _misc_weird_jl_print_weird
     _main_jl_main --> _utils_io_jl_stuff_same_name
     _main_jl_main --> _utils_math_jl_broadcast_double_mean
     _main_jl_main --> _utils_math_jl_weird_same_name
     _misc_ambig_jl_resolve -. ? .-> _misc_stuff_jl_same_name
     _misc_ambig_jl_resolve -. ? .-> _misc_weird_jl_same_name
-    _misc_imports_jl_use_imports -. ? .-> _misc_weird_jl_print_weird
+    _misc_imports_jl_use_imports --> _misc_weird_jl_print_weird
     _misc_imports_jl_use_imports --> _utils_math_jl_broadcast_double_mean
     _misc_imports_jl_use_imports --> _utils_math_jl_weird_same_name
     _utils_io_jl_stuff_same_name --> _misc_stuff_jl_same_name

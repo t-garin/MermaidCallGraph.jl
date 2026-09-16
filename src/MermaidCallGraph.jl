@@ -75,7 +75,7 @@ function compute_edges(files, module_paths, all_functions_defined, scope_groups)
             get_scope_group_functions(scope_groups, all_functions_defined, file.rel_path),
             (get_full_func_name(name, file.rel_path) for name in keys(file.defs_and_calls)),
         )
-        union!(all_edges, get_edges(file.defs_and_calls, file.rel_path, functions_in_scope, aliases, explicit_functions, implicit_functions, module_paths, all_functions_defined))
+        union!(all_edges, get_edges(file.defs_and_calls, file.rel_path, functions_in_scope, aliases, module_paths, all_functions_defined))
     end
     return all_edges
 end
