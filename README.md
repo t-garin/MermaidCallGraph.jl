@@ -1,6 +1,7 @@
 # MermaidCallGraph.jl
 
 [![Build Status](https://github.com/t-garin/MermaidCallGraph.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/t-garin/MermaidCallGraph.jl/actions/workflows/CI.yml?query=branch%3Amain)
+[![Code Coverage](https://img.shields.io/codecov/c/github/t-garin/MermaidCallGraph.jl/branch/main)](https://app.codecov.io/gh/t-garin/MermaidCallGraph.jl)
 
 ## Description
 

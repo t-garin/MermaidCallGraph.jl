@@ -1,4 +1,0 @@
-- Clean code and merge as v0.1.0-rc2
-- Check quirks are exhaustive and relevant
-- "Please also collect coverage information in your CI workflow. See https://modernjuliaworkflows.org/sharing/ for a tutorial on best practices."
-- Once done, retrigger registration : "just keep the version number the same, and retrigger the registration based on a new commit (by commenting `@JuliaRegistrator register` on that commit). This will update the existing registration PR. Changing the version number (or the name / repo URL) would create a _new_ PR, which then has to be manually closed in favor of the new one."
