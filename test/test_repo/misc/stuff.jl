@@ -8,7 +8,7 @@ function same_name()::Int
     return 2
 end
 
-# test with private function 
+# test with private function
 """
     print_stuff()
 
@@ -19,6 +19,14 @@ function print_stuff()
         return "nuchnibi"
     end
     print(get_super_string())
-end 
+end
+
+# macro definition: `macro` blocks are not function nodes, so not drawn
+macro twice(expr)
+    return esc(:(2 * $expr))
+end
+
+# abstract types define no function nodes
+abstract type Shape end
 
 end

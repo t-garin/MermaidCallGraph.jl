@@ -14,13 +14,35 @@ function print_weird()
 end
 
 # test with generic type
-"""
-    f(x)
-
-Multiply `x` by 1312.
-"""
 function f(x::T)::T where {T}
     return x * 1312
+end
+
+# varargs + keyword args: a second method of `f`, same-file merge
+function f(xs...; kw=1)
+    return sum(xs) + kw
+end
+
+# struct: `Point(...)` is a constructor call, not a function call
+struct Point
+    x::Float64
+    y::Float64
+end
+
+# callable struct: `(p::Point)(k)` registers a method on the type `Point`
+(p::Point)(k::Float64) = Point(k * p.x, k * p.y)
+
+# operator overloading: `a + b` resolves to this repo method
+Base.:+(a::Point, b::Point) = Point(a.x + b.x, a.y + b.y)
+
+# `@inline` wrappers are unwrapped to find the function definition
+@inline function describe_point(p)
+    return "($(p.x), $(p.y))"
+end
+
+# macro calls are transparent: the inner `Point(...)` call is still found
+function shift(p, dx, dy)
+    @twice Point(p.x + dx, p.y + dy)
 end
 
 end
