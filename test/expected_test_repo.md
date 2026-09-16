@@ -11,6 +11,7 @@ flowchart LR
         _lib_shapes_jl_fact["fact"]
         _lib_shapes_jl_norm["norm"]
         _lib_shapes_jl_scale["scale"]
+        _lib_shapes_jl_sqnorm["sqnorm"]
         _lib_shapes_jl_u3c8["ψ"]
         _lib_shapes_jl_u3d5["ϕ"]
         _lib_shapes_jl_u3d5u3c8_mean["ϕψ_mean"]
@@ -24,6 +25,7 @@ flowchart LR
         _misc_stuff_jl_same_name["same_name"]
     end
     subgraph "/misc/weird.jl"
+        _misc_weird_jl__["+"]
         _misc_weird_jl_Point["Point"]
         _misc_weird_jl_describe_point["describe_point"]
         _misc_weird_jl_f["f"]
@@ -31,15 +33,13 @@ flowchart LR
         _misc_weird_jl_same_name["same_name"]
         _misc_weird_jl_shift["shift"]
     end
-    subgraph "/misc/weird.jl:(. Base (quote-"
-        _misc_weird_jl____Base__quote______[" +))"]
-    end
     _lib_core_geometry_jl_broadcast_double_mean --> _lib_shapes_jl_u3d5u3c8_mean
     _lib_core_geometry_jl_polygon_perimeter --> _lib_shapes_jl_norm
     _lib_core_geometry_jl_stuff_same_name --> _misc_stuff_jl_same_name
     _lib_core_geometry_jl_weird_same_name --> _lib_shapes_jl_u3d5u3c8_mean
     _lib_core_geometry_jl_weird_same_name --> _misc_stuff_jl_same_name
     _lib_shapes_jl_norm --> _lib_shapes_jl_distance
+    _lib_shapes_jl_sqnorm --> _lib_shapes_jl_norm
     _lib_shapes_jl_u3d5u3c8_mean --> _lib_shapes_jl_u3c8
     _lib_shapes_jl_u3d5u3c8_mean --> _lib_shapes_jl_u3d5
     _main_jl_main --> _lib_core_geometry_jl_broadcast_double_mean
@@ -55,5 +55,8 @@ flowchart LR
     _main_jl_main --> _misc_weird_jl_shift
     _main_jl_resolve -. ? .-> _misc_stuff_jl_same_name
     _main_jl_resolve -. ? .-> _misc_weird_jl_same_name
+    _misc_weird_jl__ --> _misc_weird_jl_Point
+    _misc_weird_jl_f --> _misc_weird_jl__
+    _misc_weird_jl_shift --> _misc_weird_jl__
     _misc_weird_jl_shift --> _misc_weird_jl_Point
 ```

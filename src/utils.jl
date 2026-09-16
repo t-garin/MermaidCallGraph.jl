@@ -48,8 +48,10 @@ end
 Resursively finds all the calls in the lower nodes.
 """
 function get_internal_calls!(node::SyntaxNode, calls::Set{SyntaxNode})::Nothing
+    # the node itself may be a call: a short-form body like `f(x) = bar(x)` is a
+    # single call whose outermost callee would otherwise be missed
+    get_kind(node) in ("call", "dotcall") && push!(calls, get_callee(node))
     for child in get_children(node)
-        get_kind(child) in ("call", "dotcall") && push!(calls, get_callee(child))
         get_internal_calls!(child, calls)
     end
 end
@@ -88,7 +90,16 @@ function get_function_name(sig::SyntaxNode)::String
     elseif kind == "call" || kind == "dotcall"
         callee = sig[1]
         # callable objects: `(F::Foo)(x)` is a method of the type `Foo`
-        return get_kind(callee) === "::" ? string(get_children(callee)[end]) : string(callee)
+        if get_kind(callee) === "::"
+            return string(get_children(callee)[end])
+        end
+        # qualified definitions like `Base.:+(...)`: keep only the function or
+        # operator name (a trailing `:+` quote node means the operator `+`)
+        if get_kind(callee) === "."
+            last = get_children(callee)[end]
+            return get_kind(last) === "quote" ? string(get_children(last)[end]) : string(last)
+        end
+        return string(callee)
     else
         return get_function_name(get_children(sig)[1])
     end

@@ -23,6 +23,9 @@ function norm(v)
     return distance([0, 0], v)
 end
 
+# short-form function whose whole body is a single call: the edge must be drawn
+sqnorm(v) = norm(v)
+
 # recursion is not drawn as an edge
 function fact(n)
     n <= 1 && return 1
