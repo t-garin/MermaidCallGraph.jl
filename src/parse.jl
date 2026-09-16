@@ -19,7 +19,16 @@ Parse a file to find:
 function parse(path, input_dir)::ParsedFile
     defs_and_calls = Dict{String, Set{SyntaxNode}}()
     modname = nothing
-    tree = parseall(SyntaxNode, read(path, String))
+    rel_path = replace(path, input_dir => "")
+    # a single file failing to parse should not abort the whole analysis:
+    # warn and skip it instead
+    tree = try
+        parseall(SyntaxNode, read(path, String))
+    catch err
+        err isa JuliaSyntax.ParseError || rethrow()
+        @warn "skipping $(rel_path): could not parse this file, no call graph information extracted"
+        return ParsedFile(rel_path, defs_and_calls, SyntaxNode[], String[], nothing)
+    end
     children = get_children(tree)
     # strip the top-level module if any (may be wrapped in a docstring or macro
     # call, and may not be the first child: scan all children for it)
@@ -63,10 +72,19 @@ function parse(path, input_dir)::ParsedFile
             defs_and_calls[func_name] = internal_calls
         end
     end
-    rel_path = replace(path, input_dir => "")
-    included_paths = [
-        normpath(joinpath(dirname(rel_path), strip(string(include[2][1]), ['"'])))
-        for include in includes
-    ]
+    # only string-literal includes can be resolved statically, e.g.
+    # `include("a.jl")` or `Base.include("a.jl")`; any other form
+    # (`include()`, `Base.include(Main, "a.jl")`, `include(joinpath(...))`,
+    # interpolated strings) is skipped with a warning instead of crashing
+    included_paths = String[]
+    for include in includes
+        args = get_children(include)
+        is_literal = length(args) >= 2 && get_kind(args[2]) === "string" && length(get_children(args[2])) == 1
+        if !is_literal
+            @warn "skipping include call in $(rel_path): only string-literal includes are resolved"
+            continue
+        end
+        push!(included_paths, normpath(joinpath(dirname(rel_path), strip(string(args[2][1]), ['"']))))
+    end
     return ParsedFile(rel_path, defs_and_calls, imports, included_paths, modname)
 end

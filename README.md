@@ -119,6 +119,8 @@ julia --project=. -e 'using MermaidCallGraph; mermaid_call_graph(input_dir="lib"
 
 ## Quirks
 
+These quirks are not set in stone, feel free to submit a PR or issue if you want some behaviour fixed.
+
 - If multiple function methods are defined in the same file, they will be merged into one node.
 - A "?"-marked arrow means the call is ambiguous: several same-named functions are in scope, so an edge is drawn to each of them.
 - A clear arrow means the callee is uniquely resolved (single same-scope definition, explicit import, or qualified call).
@@ -127,6 +129,13 @@ julia --project=. -e 'using MermaidCallGraph; mermaid_call_graph(input_dir="lib"
 - Nested functions are not represented, and calls inside a nested function are attributed to the enclosing function.
 - Struct and abstract-type definitions are not represented as nodes; a plain constructor call (`Point(...)`) draws no edge.
 - A callable struct (`(f::Point)(k)`) registers the type name as a function, so any `Point(...)` call — including default-constructor calls — draws an edge to that method (resolution is name-based, dispatch is not modeled); the constructor call inside the method itself is treated as self-recursion and not drawn.
+- Files that fail to parse are skipped with a warning instead of aborting the whole analysis.
+- Only string-literal `include`s (`include("a.jl")`, `Base.include("a.jl")`) are resolved; any other form (`include()`, `include(joinpath(...))`, interpolated strings) is ignored with a warning.
+- Chained comparisons (`a < b < c`, `a == b == c`) are not recognized as calls, so no edge is drawn even if the project defines the operator.
+- Only the first top-level `module` in a file is analyzed; code after it (including other `module` blocks) is ignored, and functions inside nested modules are not analyzed.
+- Duplicate module names across files collide: only the last one parsed is remembered, so imports of the other may resolve to nothing or to the wrong file.
+- Code inside quoted expressions (`:(...)`, e.g. in `@eval` or generated-function bodies) is treated as executed, which can draw edges for calls that never run.
+- Inner constructors (`struct Box; Box(x) = ...; end`) are not represented, and constructor calls draw no edge.
 
 ## Contributing
 
