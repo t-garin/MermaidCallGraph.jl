@@ -26,6 +26,16 @@ end
 # short-form function whose whole body is a single call: the edge must be drawn
 sqnorm(v) = norm(v)
 
+# plain struct: a constructor call draws no edge (no callable method)
+struct Vec2
+    x::Float64
+    y::Float64
+end
+
+function unit_vec2()
+    return Vec2(1.0, 0.0)
+end
+
 # recursion is not drawn as an edge
 function fact(n)
     n <= 1 && return 1

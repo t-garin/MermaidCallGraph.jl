@@ -12,6 +12,7 @@ flowchart LR
         _lib_shapes_jl_norm["norm"]
         _lib_shapes_jl_scale["scale"]
         _lib_shapes_jl_sqnorm["sqnorm"]
+        _lib_shapes_jl_unit_vec2["unit_vec2"]
         _lib_shapes_jl_u3c8["ψ"]
         _lib_shapes_jl_u3d5["ϕ"]
         _lib_shapes_jl_u3d5u3c8_mean["ϕψ_mean"]

@@ -136,6 +136,8 @@ julia --project=. -e 'using MermaidCallGraph; mermaid_call_graph(input_dir="lib"
 - Files `include`d into the same module or script share each other's functions; an included file that defines its own module keeps its own scope.
 - Recursive calls are not drawn: a function calling itself does not produce an edge.
 - Nested functions are not represented, and calls inside a nested function are attributed to the enclosing function.
+- Struct and abstract-type definitions are not represented as nodes; a plain constructor call (`Point(...)`) draws no edge.
+- A callable struct (`(f::Point)(k)`) registers the type name as a function, so any `Point(...)` call — including default-constructor calls — draws an edge to that method (resolution is name-based, dispatch is not modeled); the constructor call inside the method itself is treated as self-recursion and not drawn.
 
 ## Contributing
 
