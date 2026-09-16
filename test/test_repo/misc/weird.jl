@@ -1,3 +1,6 @@
+# top-level code before the module: the module must still be detected
+using ..stuff
+
 module weird
 export same_name, print_weird
 
