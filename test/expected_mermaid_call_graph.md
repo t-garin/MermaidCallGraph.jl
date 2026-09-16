@@ -46,6 +46,7 @@ flowchart LR
     _MermaidCallGraph_jl_compute_edges --> _utils_jl_get_full_func_name
     _MermaidCallGraph_jl_mermaid_call_graph --> _MermaidCallGraph_jl_build_mermaid_call_graph
     _edges_jl_get_callee_full_names --> _utils_jl_get_children
+    _edges_jl_get_callee_full_names --> _utils_jl_get_full_func_name
     _edges_jl_get_callee_full_names --> _utils_jl_get_kind
     _edges_jl_get_callee_full_names --> _utils_jl_get_local_name
     _edges_jl_get_edges --> _edges_jl_get_callee_full_names

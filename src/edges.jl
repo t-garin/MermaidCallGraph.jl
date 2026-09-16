@@ -15,7 +15,7 @@ function get_callee_full_names(callee, functions_in_scope, aliases, module_paths
         end
         # only draw an edge if the qualified name is an actual repo function,
         # not e.g. a struct used as a constructor
-        full_name = mod_path * ":" * string(func)
+        full_name = get_full_func_name(string(func), mod_path)
         return full_name in all_functions_defined ? Set([full_name]) : Set{String}()
     else
         return Set{String}()
