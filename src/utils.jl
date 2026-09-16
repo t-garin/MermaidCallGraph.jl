@@ -33,24 +33,18 @@ function unwrap(node::SyntaxNode, target::String)::SyntaxNode
 end
 
 """
-Return the callee node of a call: the first child, except for infix (`a + b`)
-and postfix (`x'`) calls where the operator is the second child.
-"""
-function get_callee(node::SyntaxNode)::SyntaxNode
-    children = get_children(node)
-    if JuliaSyntax.is_infix_op_call(node) || JuliaSyntax.is_postfix_op_call(node)
-        return children[2]
-    end
-    return children[1]
-end
-
-"""
-Resursively finds all the calls in the lower nodes.
+Recursively finds all the calls in the lower nodes. The callee of a call is
+its first child, except for infix (`a + b`) and postfix (`x'`) calls where the
+operator is the second child.
 """
 function get_internal_calls!(node::SyntaxNode, calls::Set{SyntaxNode})
     # the node itself may be a call: a short-form body like `f(x) = bar(x)` is a
     # single call whose outermost callee would otherwise be missed
-    get_kind(node) in ("call", "dotcall") && push!(calls, get_callee(node))
+    if get_kind(node) in ("call", "dotcall")
+        children = get_children(node)
+        callee = JuliaSyntax.is_infix_op_call(node) || JuliaSyntax.is_postfix_op_call(node) ? children[2] : children[1]
+        push!(calls, callee)
+    end
     for child in get_children(node)
         get_internal_calls!(child, calls)
     end
