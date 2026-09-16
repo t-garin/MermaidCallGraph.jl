@@ -99,7 +99,8 @@ end
 Return the local function name of a full function name.
 """
 function get_local_name(full_name::String)::String
-    return split(full_name, ":")[end]
+    # split on the last `:` only, so names or paths containing `:` survive
+    return rsplit(full_name, ":", limit=2)[end]
 end
 
 """
