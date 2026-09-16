@@ -42,7 +42,12 @@ function get_internal_calls!(node::SyntaxNode, calls::Set{SyntaxNode})
     # single call whose outermost callee would otherwise be missed
     if get_kind(node) in ("call", "dotcall")
         children = get_children(node)
-        callee = JuliaSyntax.is_infix_op_call(node) || JuliaSyntax.is_postfix_op_call(node) ? children[2] : children[1]
+        if JuliaSyntax.is_infix_op_call(node) || JuliaSyntax.is_postfix_op_call(node)
+            # infix (`a + b`) and postfix (`x'`) calls put the operator second
+            callee = children[2]
+        else
+            callee = children[1]
+        end
         push!(calls, callee)
     end
     for child in get_children(node)
@@ -90,11 +95,22 @@ function get_function_name(sig::SyntaxNode)::String
         # qualified definitions like `Base.:+(...)`: keep only the function or
         # operator name (a trailing `:+` quote node means the operator `+`)
         if get_kind(callee) === "."
-            last = get_children(callee)[end]
-            return get_kind(last) === "quote" ? string(get_children(last)[end]) : string(last)
+            return get_qualified_name(callee)
         end
         return string(callee)
     else
         return get_function_name(get_children(sig)[1])
     end
+end
+
+"""
+Return the function or operator name of a qualified callee like `Base.sin` or
+`Base.:+`, unwrapping a trailing quote node (`:+` → `+`).
+"""
+function get_qualified_name(callee::SyntaxNode)::String
+    last = get_children(callee)[end]
+    if get_kind(last) === "quote"
+        return string(get_children(last)[end])
+    end
+    return string(last)
 end

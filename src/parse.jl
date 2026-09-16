@@ -78,21 +78,44 @@ function parse(path, input_dir)::ParsedFile
     # `include(mod, "a.jl")` / `Base.include(mod, "a.jl")`. Anything else
     # (`include()`, `include(joinpath(...))`, interpolated strings) is skipped
     # with a warning instead of crashing
+    included_paths = resolve_included_paths(includes, rel_path)
+    return ParsedFile(rel_path, defs_and_calls, imports, included_paths, modname)
+end
+
+"""
+Resolve string-literal `include` calls to normalized relative paths.
+"""
+function resolve_included_paths(includes, rel_path)
     included_paths = String[]
     for include in includes
-        args = get_children(include)
-        path_arg = nothing
-        for arg in args[2:end]
-            if get_kind(arg) === "string" && length(get_children(arg)) == 1
-                path_arg = arg
-                break
-            end
-        end
+        path_arg = find_string_literal_arg(include)
         if path_arg === nothing
             @warn "skipping include call in $(rel_path): no string-literal include path found"
             continue
         end
-        push!(included_paths, normpath(joinpath(dirname(rel_path), strip(string(path_arg[1]), ['"']))))
+        push!(included_paths, normpath(joinpath(dirname(rel_path), string_literal_value(path_arg))))
     end
-    return ParsedFile(rel_path, defs_and_calls, imports, included_paths, modname)
+    return included_paths
+end
+
+"""
+Return the single plain string-literal argument of a call, or nothing if the
+call has none.
+"""
+function find_string_literal_arg(call)
+    for arg in get_children(call)[2:end]
+        if get_kind(arg) === "string" && length(get_children(arg)) == 1
+            return arg
+        end
+    end
+    return nothing
+end
+
+"""
+Return the content of a string-literal syntax node (the literal text without
+the surrounding quotes).
+"""
+function string_literal_value(node)
+    # the first child holds the literal content, still including the quotes
+    return strip(string(get_children(node)[1]), ['"'])
 end

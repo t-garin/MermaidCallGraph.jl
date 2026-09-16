@@ -16,12 +16,17 @@ flowchart LR
         _genmd_jl_get_node_id["get_node_id"]
     end
     subgraph "/parse.jl"
+        _parse_jl_find_string_literal_arg["find_string_literal_arg"]
         _parse_jl_parse["parse"]
+        _parse_jl_resolve_included_paths["resolve_included_paths"]
+        _parse_jl_string_literal_value["string_literal_value"]
     end
     subgraph "/scope.jl"
         _scope_jl_compute_scope_groups["compute_scope_groups"]
         _scope_jl_get_imported_functions_in_scope["get_imported_functions_in_scope"]
         _scope_jl_get_scope_group_functions["get_scope_group_functions"]
+        _scope_jl_handle_bare_module_import["handle_bare_module_import"]
+        _scope_jl_handle_explicit_import_list["handle_explicit_import_list"]
     end
     subgraph "/utils.jl"
         _utils_jl_get_children["get_children"]
@@ -31,6 +36,7 @@ flowchart LR
         _utils_jl_get_internal_calls_["get_internal_calls!"]
         _utils_jl_get_kind["get_kind"]
         _utils_jl_get_local_name["get_local_name"]
+        _utils_jl_get_qualified_name["get_qualified_name"]
         _utils_jl_unwrap["unwrap"]
     end
     _MermaidCallGraph_jl_build_mermaid_call_graph --> _MermaidCallGraph_jl_collect_function_info
@@ -54,18 +60,34 @@ flowchart LR
     _genmd_jl_generate_mermaid_markdown --> _genmd_jl_assign_node_ids
     _genmd_jl_generate_mermaid_markdown --> _utils_jl_get_full_func_path
     _genmd_jl_generate_mermaid_markdown --> _utils_jl_get_local_name
+    _parse_jl_find_string_literal_arg --> _utils_jl_get_children
+    _parse_jl_find_string_literal_arg --> _utils_jl_get_kind
+    _parse_jl_parse --> _parse_jl_resolve_included_paths
     _parse_jl_parse --> _utils_jl_get_children
     _parse_jl_parse --> _utils_jl_get_function_name
     _parse_jl_parse --> _utils_jl_get_internal_calls_
     _parse_jl_parse --> _utils_jl_get_kind
     _parse_jl_parse --> _utils_jl_unwrap
+    _parse_jl_resolve_included_paths --> _parse_jl_find_string_literal_arg
+    _parse_jl_resolve_included_paths --> _parse_jl_string_literal_value
+    _parse_jl_string_literal_value --> _utils_jl_get_children
+    _scope_jl_get_imported_functions_in_scope --> _scope_jl_handle_bare_module_import
+    _scope_jl_get_imported_functions_in_scope --> _scope_jl_handle_explicit_import_list
     _scope_jl_get_imported_functions_in_scope --> _utils_jl_get_children
-    _scope_jl_get_imported_functions_in_scope --> _utils_jl_get_full_func_name
     _scope_jl_get_imported_functions_in_scope --> _utils_jl_get_kind
+    _scope_jl_handle_bare_module_import --> _utils_jl_get_children
+    _scope_jl_handle_bare_module_import --> _utils_jl_get_full_func_name
+    _scope_jl_handle_bare_module_import --> _utils_jl_get_kind
+    _scope_jl_handle_explicit_import_list --> _utils_jl_get_children
+    _scope_jl_handle_explicit_import_list --> _utils_jl_get_full_func_name
+    _scope_jl_handle_explicit_import_list --> _utils_jl_get_kind
     _utils_jl_get_function_name --> _utils_jl_get_children
     _utils_jl_get_function_name --> _utils_jl_get_kind
+    _utils_jl_get_function_name --> _utils_jl_get_qualified_name
     _utils_jl_get_internal_calls_ --> _utils_jl_get_children
     _utils_jl_get_internal_calls_ --> _utils_jl_get_kind
+    _utils_jl_get_qualified_name --> _utils_jl_get_children
+    _utils_jl_get_qualified_name --> _utils_jl_get_kind
     _utils_jl_unwrap --> _utils_jl_get_children
     _utils_jl_unwrap --> _utils_jl_get_kind
 ```

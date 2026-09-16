@@ -56,7 +56,9 @@ function collect_function_info(files)
     module_paths = Dict{String, String}()
     all_functions_defined = Set{String}()
     for file in files
-        file.modname !== nothing && (module_paths[file.modname] = file.rel_path)
+        if file.modname !== nothing
+            module_paths[file.modname] = file.rel_path
+        end
         union!(all_functions_defined, (get_full_func_name(name, file.rel_path) for name in keys(file.defs_and_calls)))
     end
     return module_paths, all_functions_defined

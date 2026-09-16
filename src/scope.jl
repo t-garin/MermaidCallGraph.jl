@@ -9,53 +9,70 @@ function get_imported_functions_in_scope(imports, module_paths, all_functions_de
     for imp in imports
         # a `using`/`import` statement can name several modules (`using A, B`)
         for child in get_children(imp)
-            # explicit import list: `using Mod: a, b` / `import Mod: a as b`
             if get_kind(child) === ":"
-                mod, funcs... = get_children(child)
-                mod_path = get(module_paths, string(get_children(mod)[end]), nothing)
-                mod_path === nothing && continue
-                for func in funcs
-                    if get_kind(func) === "as"
-                        original = get_children(func)[1]
-                        alias = string(get_children(func)[end])
-                        func_name = string(get_children(original)[end])
-                    else
-                        func_name = string(get_children(func)[end])
-                        alias = nothing
-                    end
-                    full_name = get_full_func_name(func_name, mod_path)
-                    full_name in all_functions_defined || continue
-                    push!(explicit_functions, full_name)
-                    if alias !== nothing
-                        push!(get!(aliases, alias, Set{String}()), full_name)
-                    end
-                end
-            # single-module import: `using A` (implicit) or `import Mod.func` (explicit)
+                # explicit import list: `using Mod: a, b` / `import Mod: a as b`
+                handle_explicit_import_list(child, module_paths, all_functions_defined, explicit_functions, aliases)
             else
-                # relative markers (`.`, `..`) are children too; keep the identifiers
-                identifiers = [c for c in get_children(child) if get_kind(c) === "Identifier"]
-                # `import Mod.func`: several identifiers, import the last from the first
-                if length(identifiers) > 1
-                    get_kind(imp) === "import" || continue
-                    mod_path = get(module_paths, string(identifiers[1]), nothing)
-                    mod_path === nothing && continue
-                    full_name = get_full_func_name(string(identifiers[end]), mod_path)
-                    full_name in all_functions_defined && push!(explicit_functions, full_name)
-                # `using A`: implicit import of every function of the module
-                else
-                    get_kind(imp) === "using" || continue
-                    mod_path = get(module_paths, string(identifiers[1]), nothing)
-                    mod_path === nothing && continue
-                    for func_name in all_functions_defined
-                        if startswith(func_name, mod_path * ":")
-                            push!(implicit_functions, func_name)
-                        end
-                    end
-                end
+                # single-module import: `using A` (implicit) or `import Mod.func` (explicit)
+                handle_bare_module_import(child, imp, module_paths, all_functions_defined, explicit_functions, implicit_functions)
             end
         end
     end
     return explicit_functions, implicit_functions, aliases
+end
+
+"""
+Handle an explicit import list: `using Mod: a, b` / `import Mod: a as b`.
+Records the imported repo functions and any `as` aliases (alias → full name).
+"""
+function handle_explicit_import_list(child, module_paths, all_functions_defined, explicit_functions, aliases)
+    mod, funcs... = get_children(child)
+    mod_path = get(module_paths, string(get_children(mod)[end]), nothing)
+    mod_path === nothing && return
+    for func in funcs
+        if get_kind(func) === "as"
+            original = get_children(func)[1]
+            alias = string(get_children(func)[end])
+            func_name = string(get_children(original)[end])
+        else
+            func_name = string(get_children(func)[end])
+            alias = nothing
+        end
+        full_name = get_full_func_name(func_name, mod_path)
+        full_name in all_functions_defined || continue
+        push!(explicit_functions, full_name)
+        if alias !== nothing
+            push!(get!(aliases, alias, Set{String}()), full_name)
+        end
+    end
+end
+
+"""
+Handle a single-module import: `using A` (implicit, every repo function of the
+module in scope) or `import Mod.func` (explicit, one function). Relative
+markers (`.`, `..`) are children of the import too, so only the identifiers
+are considered.
+"""
+function handle_bare_module_import(child, imp, module_paths, all_functions_defined, explicit_functions, implicit_functions)
+    identifiers = [c for c in get_children(child) if get_kind(c) === "Identifier"]
+    if length(identifiers) > 1
+        # `import Mod.func`: import the last identifier from the first (the module)
+        get_kind(imp) === "import" || return
+        mod_path = get(module_paths, string(identifiers[1]), nothing)
+        mod_path === nothing && return
+        full_name = get_full_func_name(string(identifiers[end]), mod_path)
+        full_name in all_functions_defined && push!(explicit_functions, full_name)
+    else
+        # `using A`: every repo function of the module is implicitly in scope
+        get_kind(imp) === "using" || return
+        mod_path = get(module_paths, string(identifiers[1]), nothing)
+        mod_path === nothing && return
+        for func_name in all_functions_defined
+            if startswith(func_name, mod_path * ":")
+                push!(implicit_functions, func_name)
+            end
+        end
+    end
 end
 
 """
