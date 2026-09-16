@@ -21,6 +21,29 @@ function get_node_id(full_name::String)::String
 end
 
 """
+Assign each function a unique mermaid node id. Base ids come from
+`get_node_id`; when several functions map to the same id (e.g. file paths
+differing only by punctuation, such as `a-b.jl` and `a_b.jl`), the later ones
+get a numeric suffix. Iterating in sorted order keeps the output deterministic.
+"""
+function assign_node_ids(all_functions)::Dict{String, String}
+    taken = Dict{String, String}()
+    id_of = Dict{String, String}()
+    for f in sort(collect(all_functions))
+        base = get_node_id(f)
+        id = base
+        n = 2
+        while haskey(taken, id)
+            id = base * "_" * string(n)
+            n += 1
+        end
+        taken[id] = f
+        id_of[f] = id
+    end
+    return id_of
+end
+
+"""
 Generate the Mermaid flowchart markdown from the repo functions and call edges.
 Edges are tuples (caller, callee, implicit); implicit edges use a dotted,
 "?"-marked arrow.
@@ -28,15 +51,16 @@ Edges are tuples (caller, callee, implicit); implicit edges use a dotted,
 function generate_mermaid_markdown(all_functions, edges, orientation)
     lines = String["flowchart $(orientation)"]
     paths = sort(unique([get_full_func_path(f) for f in all_functions]))
+    id_of = assign_node_ids(all_functions)
     for path in paths
         push!(lines, "    subgraph \"$(path)\"")
         funcs = sort([f for f in all_functions if get_full_func_path(f) == path])
-        append!(lines, "        $(get_node_id(f))[\"$(get_local_name(f))\"]" for f in funcs)
+        append!(lines, "        $(id_of[f])[\"$(get_local_name(f))\"]" for f in funcs)
         push!(lines, "    end")
     end
     for (caller, callee, implicit) in sort(collect(edges))
         arrow = implicit ? "-. ? .->" : "-->"
-        push!(lines, "    $(get_node_id(caller)) $arrow $(get_node_id(callee))")
+        push!(lines, "    $(id_of[caller]) $arrow $(id_of[callee])")
     end
     return join(lines, "\n")
 end

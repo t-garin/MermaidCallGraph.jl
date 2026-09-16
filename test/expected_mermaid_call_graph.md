@@ -11,6 +11,7 @@ flowchart LR
         _edges_jl_get_edges["get_edges"]
     end
     subgraph "/genmd.jl"
+        _genmd_jl_assign_node_ids["assign_node_ids"]
         _genmd_jl_generate_mermaid_markdown["generate_mermaid_markdown"]
         _genmd_jl_get_node_id["get_node_id"]
     end
@@ -59,7 +60,8 @@ flowchart LR
     _edges_jl_get_edges --> _edges_jl_get_callee_full_names
     _edges_jl_get_edges --> _utils_jl_get_full_func_name
     _edges_jl_get_edges --> _utils_jl_get_kind
-    _genmd_jl_generate_mermaid_markdown --> _genmd_jl_get_node_id
+    _genmd_jl_assign_node_ids --> _genmd_jl_get_node_id
+    _genmd_jl_generate_mermaid_markdown --> _genmd_jl_assign_node_ids
     _genmd_jl_generate_mermaid_markdown --> _utils_jl_get_full_func_path
     _genmd_jl_generate_mermaid_markdown --> _utils_jl_get_local_name
     _parse_jl_parse --> _utils_jl_get_children
