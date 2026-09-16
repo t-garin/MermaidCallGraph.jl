@@ -19,8 +19,15 @@ internal call graph to `output_file`. A positional variant
 `mermaid_call_graph(input_dir, output_file, orientation)` is also available.
 """
 function mermaid_call_graph(; input_dir::String="src", output_file::String="MermaidCallGraph.md", orientation::String="LR")::Nothing
+    if !isdir(input_dir)
+        @warn "input directory $(input_dir) does not exist, nothing to do"
+        return nothing
+    end
     paths = find_jl_files(input_dir)
-    isempty(paths) && @warn "no .jl files found under $(input_dir), nothing to do"
+    if isempty(paths)
+        @warn "no .jl files found under $(input_dir), nothing to do"
+        return nothing
+    end
     markdown = build_mermaid_call_graph(paths, input_dir, orientation)
     write(output_file, "```mermaid\n" * markdown * "\n```\n")
     return nothing
