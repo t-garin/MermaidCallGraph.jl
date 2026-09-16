@@ -50,6 +50,25 @@ function unwrap_definition(node::SyntaxNode)::SyntaxNode
 end
 
 """
+Return the module node wrapped inside a docstring (`doc`) or macro-call
+(`macrocall`) node, if any; return the node itself when it is a module, and
+`nothing` otherwise. Handles stacked wrappers recursively.
+"""
+function unwrap_module(node::SyntaxNode)::Union{SyntaxNode, Nothing}
+    kind = get_kind(node)
+    if kind === "doc" || kind === "macrocall"
+        for child in get_children(node)
+            child_kind = get_kind(child)
+            if child_kind === "module" || child_kind === "doc" || child_kind === "macrocall"
+                return unwrap_module(child)
+            end
+        end
+        return nothing
+    end
+    return kind === "module" ? node : nothing
+end
+
+"""
 True if function call, False otherwise.
 """
 function is_function_call(node::SyntaxNode)::Bool

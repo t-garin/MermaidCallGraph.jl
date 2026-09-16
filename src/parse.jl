@@ -22,12 +22,15 @@ function parse(path, input_dir)::ParsedFile
     modname = nothing
     tree = parseall(SyntaxNode, read(path, String))
     children = get_children(tree)
-    # strip module if any
-    if !isempty(children) && get_kind(children[1]) === "module"
-        # child 1 is the module name, child 2 is the body block
-        modname, tree = get_children(children[1])
-        modname = string(modname)
-        children = get_children(tree)
+    # strip module if any (may be wrapped in a docstring or macro call)
+    if !isempty(children)
+        modnode = unwrap_module(children[1])
+        if modnode !== nothing
+            # child 1 is the module name, child 2 is the body block
+            modname, tree = get_children(modnode)
+            modname = string(modname)
+            children = get_children(tree)
+        end
     end
     imports = [node for node in get_children(tree) if is_import(node)]
     includes = [node for node in get_children(tree) if is_include(node)]
