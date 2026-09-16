@@ -15,6 +15,9 @@ flowchart LR
     subgraph "/misc/ambig.jl"
         _misc_ambig_jl_resolve["resolve"]
     end
+    subgraph "/misc/imports.jl"
+        _misc_imports_jl_use_imports["use_imports"]
+    end
     subgraph "/misc/stuff.jl"
         _misc_stuff_jl_print_stuff["print_stuff"]
         _misc_stuff_jl_same_name["same_name"]
@@ -46,6 +49,9 @@ flowchart LR
     _main_jl_main --> _utils_math_jl_weird_same_name
     _misc_ambig_jl_resolve -. ? .-> _misc_stuff_jl_same_name
     _misc_ambig_jl_resolve -. ? .-> _misc_weird_jl_same_name
+    _misc_imports_jl_use_imports -. ? .-> _misc_weird_jl_print_weird
+    _misc_imports_jl_use_imports --> _utils_math_jl_broadcast_double_mean
+    _misc_imports_jl_use_imports --> _utils_math_jl_weird_same_name
     _utils_io_jl_stuff_same_name --> _misc_stuff_jl_same_name
     _utils_math_jl_broadcast_double_mean --> _utils_math_jl_u3d5u3c8_mean
     _utils_math_jl_weird_same_name --> _misc_weird_jl_same_name
