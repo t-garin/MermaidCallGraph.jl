@@ -57,6 +57,18 @@ function is_function_call(node::SyntaxNode)::Bool
 end
 
 """
+Return the callee node of a call: the first child, except for infix (`a + b`)
+and postfix (`x'`) calls where the operator is the second child.
+"""
+function get_callee(node::SyntaxNode)::SyntaxNode
+    children = get_children(node)
+    if JuliaSyntax.is_infix_op_call(node) || JuliaSyntax.is_postfix_op_call(node)
+        return children[2]
+    end
+    return children[1]
+end
+
+"""
 True if function import, False otherwise.
 """
 function is_import(node::SyntaxNode)::Bool
@@ -75,7 +87,7 @@ Resursively finds all the calls in the lower nodes.
 """
 function get_internal_calls!(node::SyntaxNode, calls::Set{SyntaxNode})::Nothing
     for child in get_children(node)
-        is_function_call(child) && push!(calls, child[1])
+        is_function_call(child) && push!(calls, get_callee(child))
         get_internal_calls!(child, calls)
     end
 end

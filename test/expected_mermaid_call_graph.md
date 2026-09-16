@@ -24,6 +24,7 @@ flowchart LR
     end
     subgraph "/utils.jl"
         _utils_jl_find_jl_files["find_jl_files"]
+        _utils_jl_get_callee["get_callee"]
         _utils_jl_get_children["get_children"]
         _utils_jl_get_full_func_name["get_full_func_name"]
         _utils_jl_get_full_func_path["get_full_func_path"]
@@ -73,11 +74,13 @@ flowchart LR
     _scope_jl_get_imported_functions_in_scope --> _utils_jl_get_import_module_name
     _scope_jl_get_imported_functions_in_scope --> _utils_jl_get_imported_name
     _scope_jl_get_imported_functions_in_scope --> _utils_jl_get_kind
+    _utils_jl_get_callee --> _utils_jl_get_children
     _utils_jl_get_function_name --> _utils_jl_get_children
     _utils_jl_get_function_name --> _utils_jl_get_kind
     _utils_jl_get_import_module_name --> _utils_jl_get_children
     _utils_jl_get_imported_name --> _utils_jl_get_children
     _utils_jl_get_imported_name --> _utils_jl_get_kind
+    _utils_jl_get_internal_calls_ --> _utils_jl_get_callee
     _utils_jl_get_internal_calls_ --> _utils_jl_get_children
     _utils_jl_get_internal_calls_ --> _utils_jl_is_function_call
     _utils_jl_is_function_call --> _utils_jl_get_kind
