@@ -23,7 +23,7 @@ function mermaid_call_graph(; input_dir::String="src", output_file::String="Merm
         @warn "input directory $(input_dir) does not exist, nothing to do"
         return nothing
     end
-    paths = find_jl_files(input_dir)
+    paths = [joinpath(root, f) for (root, _, files) in walkdir(input_dir) for f in files if endswith(f, ".jl")]
     if isempty(paths)
         @warn "no .jl files found under $(input_dir), nothing to do"
         return nothing

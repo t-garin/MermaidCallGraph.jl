@@ -1,15 +1,4 @@
 """
-Recursively find all Julia source files in a directory.
-"""
-function find_jl_files(dir::String)::Vector{String}
-    entries = readdir(dir, join=true)
-    return vcat(
-        [find_jl_files(f) for f in entries if isdir(f)]...,
-        [f for f in entries if endswith(f, ".jl")],
-    )
-end
-
-"""
 Return the children of a syntax node as a vector.
 """
 function get_children(node::SyntaxNode)::Vector{SyntaxNode}

@@ -24,7 +24,6 @@ flowchart LR
         _scope_jl_get_scope_group_functions["get_scope_group_functions"]
     end
     subgraph "/utils.jl"
-        _utils_jl_find_jl_files["find_jl_files"]
         _utils_jl_get_callee["get_callee"]
         _utils_jl_get_children["get_children"]
         _utils_jl_get_full_func_name["get_full_func_name"]
@@ -46,7 +45,6 @@ flowchart LR
     _MermaidCallGraph_jl_compute_edges --> _scope_jl_get_scope_group_functions
     _MermaidCallGraph_jl_compute_edges --> _utils_jl_get_full_func_name
     _MermaidCallGraph_jl_mermaid_call_graph --> _MermaidCallGraph_jl_build_mermaid_call_graph
-    _MermaidCallGraph_jl_mermaid_call_graph --> _utils_jl_find_jl_files
     _edges_jl_get_callee_full_names --> _utils_jl_get_children
     _edges_jl_get_callee_full_names --> _utils_jl_get_kind
     _edges_jl_get_callee_full_names --> _utils_jl_get_local_name
