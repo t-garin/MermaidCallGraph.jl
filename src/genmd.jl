@@ -27,17 +27,17 @@ differing only by punctuation, such as `a-b.jl` and `a_b.jl`), the later ones
 get a numeric suffix. Iterating in sorted order keeps the output deterministic.
 """
 function assign_node_ids(all_functions)::Dict{String, String}
-    taken = Dict{String, String}()
+    taken = Set{String}()
     id_of = Dict{String, String}()
     for f in sort(collect(all_functions))
         base = get_node_id(f)
         id = base
         n = 2
-        while haskey(taken, id)
+        while id in taken
             id = base * "_" * string(n)
             n += 1
         end
-        taken[id] = f
+        push!(taken, id)
         id_of[f] = id
     end
     return id_of

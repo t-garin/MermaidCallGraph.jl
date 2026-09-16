@@ -47,7 +47,7 @@ end
 """
 Resursively finds all the calls in the lower nodes.
 """
-function get_internal_calls!(node::SyntaxNode, calls::Set{SyntaxNode})::Nothing
+function get_internal_calls!(node::SyntaxNode, calls::Set{SyntaxNode})
     # the node itself may be a call: a short-form body like `f(x) = bar(x)` is a
     # single call whose outermost callee would otherwise be missed
     get_kind(node) in ("call", "dotcall") && push!(calls, get_callee(node))

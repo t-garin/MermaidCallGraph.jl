@@ -18,7 +18,7 @@ Analyze the Julia files under `input_dir` and write a Mermaid flowchart of the
 internal call graph to `output_file`. A positional variant
 `mermaid_call_graph(input_dir, output_file, orientation)` is also available.
 """
-function mermaid_call_graph(; input_dir::String="src", output_file::String="MermaidCallGraph.md", orientation::String="LR")::Nothing
+function mermaid_call_graph(; input_dir::String="src", output_file::String="MermaidCallGraph.md", orientation::String="LR")
     if !isdir(input_dir)
         @warn "input directory $(input_dir) does not exist, nothing to do"
         return nothing
@@ -33,7 +33,7 @@ function mermaid_call_graph(; input_dir::String="src", output_file::String="Merm
     return nothing
 end
 
-function mermaid_call_graph(input_dir::String, output_file::String, orientation::String)::Nothing
+function mermaid_call_graph(input_dir::String, output_file::String, orientation::String)
     return mermaid_call_graph(input_dir=input_dir, output_file=output_file, orientation=orientation)
 end
 

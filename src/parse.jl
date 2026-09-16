@@ -2,7 +2,6 @@
 Parsed content of one source file.
 """
 struct ParsedFile
-    path::String
     rel_path::String
     defs_and_calls::Dict{String, Set{SyntaxNode}}
     imports::Vector{SyntaxNode}
@@ -69,5 +68,5 @@ function parse(path, input_dir)::ParsedFile
         normpath(joinpath(dirname(rel_path), strip(string(include[2][1]), ['"'])))
         for include in includes
     ]
-    return ParsedFile(path, rel_path, defs_and_calls, imports, included_paths, modname)
+    return ParsedFile(rel_path, defs_and_calls, imports, included_paths, modname)
 end
